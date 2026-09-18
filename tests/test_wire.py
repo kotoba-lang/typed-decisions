@@ -14,3 +14,11 @@ def test_proposal_is_a_pointer_not_text():
     # memo key is a function of content only: same inputs -> same key, any option hash change -> different key
     assert memo_key("s", q, hashes) == memo_key("s", q, list(hashes))
     assert memo_key("s", q, hashes) != memo_key("s", q, ["h1", "h2", "h9"])
+
+
+def test_kaizen_issue_id_is_the_memo_key():
+    from typed_decisions.wire import to_kaizen_issue
+    q = Question("q", "choice", "Which?", ["a.b/x", "a.b/y"], 1)
+    p = proposal("a.b/f", "s", q, [0.2, 0.8], ["h1", "h2"], admit_noul=0.9)
+    i = to_kaizen_issue(p, "kotoba-lang", "typed-decisions")
+    assert i["id"] == "td-" + p["memo-key"][:16] and i["kind"] == "typed-decision" and "nothing was executed" in i["body"]

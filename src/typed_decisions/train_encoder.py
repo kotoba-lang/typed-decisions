@@ -14,6 +14,8 @@ import torch
 
 from .schema import read_jsonl
 from .encoder import DecisionEncoder, Collator, load_tokenizer, decision_loss, predict
+from .augment import augment, pair
+import torch.nn.functional as F
 from .metrics import summarize, fit_temperature
 from . import bench
 
@@ -52,6 +54,8 @@ def main(argv=None) -> dict:
     ap.add_argument("--save", action="store_true")
     ap.add_argument("--tiny", action="store_true", help="random tiny ModernBERT config instead of pretrained (tests)")
     ap.add_argument("--pool", default="span", choices=["opt", "q-opt", "span"])
+    ap.add_argument("--augment", type=float, default=0.0, help="probability that a train question is augmented (shuffle / paraphrase / drop / relabel / negate), gold preserved")
+    ap.add_argument("--consistency", type=float, default=0.0, help="weight of the symmetric KL between two surface forms of the same question (needs a second forward)")
     ap.add_argument("--no-amp", action="store_true", help="fp32 forward on cuda (isolates bf16 autocast)")
     ap.add_argument("--attn", default="sdpa", help="attn_implementation for the backbone: sdpa | eager")
     ap.add_argument("--reference-compile", default="auto", choices=["auto", "true", "false"], help="ModernBERT config.reference_compile")
@@ -110,10 +114,37 @@ def main(argv=None) -> dict:
             if step >= total_steps:
                 break
             chunk = [train[j] for j in order[i : i + a.batch]]
-            batch = coll([(e.state, e.questions) for e in chunk], dev)
+            items = [(e.state, [augment(q, random) if a.augment and random.random() < a.augment else q for q in e.questions]) for e in chunk]
+            batch = coll(items, dev)
             with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=use_amp):
                 logits = model(batch["input_ids"], batch["attention_mask"], batch["opt_pos"], batch["opt_mask"], batch["q_pos"], batch["seg"])
             loss, info = decision_loss(logits.float(), batch["gold"], a.brier_weight)
+            if a.consistency > 0:
+                # second surface form of every question (same gold); symmetric KL on the option distributions,
+                # aligned by mapping both back to the ORIGINAL option order (shuffle/drop permute options)
+                items2 = [(st, [pair(q, random)[1] for q in qs]) for st, qs in items]
+                batch2 = coll(items2, dev)
+                with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=use_amp):
+                    logits2 = model(batch2["input_ids"], batch2["attention_mask"], batch2["opt_pos"], batch2["opt_mask"], batch2["q_pos"], batch2["seg"]).float()
+                kl, npairs = 0.0, 0
+                for b, ((st, qs), (_, qs2)) in enumerate(zip(items, items2)):
+                    for qi, (q, q2) in enumerate(zip(qs, qs2)):
+                        if q.kind == "score":  # relabel keeps order; other kinds: align by option text
+                            common = list(range(len(q.options)))
+                            idx1, idx2 = common, common
+                        else:
+                            common = [o for o in q.options if o in q2.options]
+                            if len(common) < 2:
+                                continue
+                            idx1 = [q.options.index(o) for o in common]
+                            idx2 = [q2.options.index(o) for o in common]
+                        p1 = logits[b, qi, idx1].float().log_softmax(-1)
+                        p2 = logits2[b, qi, idx2].log_softmax(-1)
+                        kl = kl + 0.5 * (F.kl_div(p2, p1, log_target=True, reduction="sum") + F.kl_div(p1, p2, log_target=True, reduction="sum"))
+                        npairs += 1
+                if npairs:
+                    loss = loss + a.consistency * kl / npairs
+                    info["kl"] = float(kl.detach() / npairs)
             opt.zero_grad(set_to_none=True)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -122,7 +153,7 @@ def main(argv=None) -> dict:
             tokens += int(batch["attention_mask"].sum())
             losses.append((step, float(loss), info["ce"], info["brier"]))
             if step % 50 == 0:
-                print(f"step {step}/{total_steps} loss {loss.item():.4f} ce {info['ce']:.4f} brier {info['brier']:.4f} lr {sched.get_last_lr()[0]:.2e}", flush=True)
+                print(f"step {step}/{total_steps} loss {loss.item():.4f} ce {info['ce']:.4f} brier {info['brier']:.4f} kl {info.get('kl', 0.0):.4f} lr {sched.get_last_lr()[0]:.2e}", flush=True)
             step += 1
     train_s = time.time() - t0
     rep["train"] = {"steps": total_steps, "wall_s": train_s, "seq_tokens": tokens, "seq_tokens_per_s": tokens / max(train_s, 1e-9),

@@ -286,3 +286,53 @@ distractor（型情報は index に無いので「同 ns 近傍」で代用）�
 :confidence … :admit? {:noul … :threshold … :decision :autonomous|:escalate} :memo-key …}`。
 `memo-key` = sha256(state, question, option hash 列) —— symbol-index の closure hash と同じ流儀で、
 同じ入力の判断は forward を走らせない。実行はしない（agent は propose まで）。
+
+## 第 3 反復（2026-09-18）: 言い換え・否定・option 順の augmentation、consistency loss、教師の OOD 精度
+
+`augment.py`（gold を構造的に保つ変換: choice の option 順 shuffle / 言い換え template / distractor の
+drop / score 段階名の同義置換 / noul の否定 = gold 反転）を訓練時に確率 p で掛け、`--consistency` で
+同じ判断の 2 表層の対称 KL を足す。DeBERTa-v3-large、18k state、test 1,500 state。
+
+| | in-domain | **OOD** | OOD ECE | boolq 否定 noul | b77 topic | b77 outflow | boolq support | 費用 |
+|---|---|---|---|---|---|---|---|---|
+| baseline（1 ep） | 0.852 | 0.622 | 0.116 | 0.671 | 0.578 | 0.685 | 0.750 | $0.26 |
+| **augment p=0.7（1 ep）** | 0.846 | **0.648** | **0.088** | **0.83** | 0.55 | **0.80** | 0.71 | $0.26 |
+| augment 0.7 + consistency 0.5（1 ep） | 0.852 | 0.635 | 0.110 | 0.83 | 0.63 | 0.73 | 0.60 | $0.50 |
+| augment 0.5 + consistency 0.2（2 ep） | 0.855 | 0.621 | 0.130 | 0.84 | 0.52 | 0.75 | 0.60 | $0.99 |
+
+- **augmentation だけで OOD +2.6 pt、否定形 noul +16 pt、OOD ECE −0.03**、in-domain は −0.6 pt。
+  否定は「訓練で見せれば読む」。
+- **consistency KL は足しても効かない**（この規模では）。forward 2 倍で費用 2 倍、OOD は同等か下。
+  2 epoch も OOD を上げない（in-domain だけ上がる = 暗記側に振れる）。
+- **score は依然 OOD で多数派以下**（0.22〜0.38）。ただし教師も同じ 2 問で 0.31 / 0.39 —— 3 model +
+  教師が揃って落ちるので、**OOD の score 2 問（b77 urgency / sst5 intensity）の規則 gold 自体が
+  怪しい**。この 2 問は次の反復で gold を作り直すまで数字を読まない。
+
+### 教師の OOD 精度（`data/teacher-ood-test.jsonl`、280 state、726 question）
+
+| | 教師 whitehacker | 最良 student（augment） |
+|---|---|---|
+| OOD 全体 | **0.696** | 0.648 |
+| b77 topic | **0.742** | 0.55 |
+| b77 outflow noul | 0.859 | 0.80 |
+| boolq support | **0.909** | 0.71 |
+| boolq 否定 noul | 0.854 | 0.83 |
+| sst5 tone | 0.674 | 0.77 |
+| sst5 推薦 noul | 0.833 | 0.91 |
+
+教師は **OOD では student より 5 pt 上**（in-domain では 15 pt 下）。差が大きいのは boolq の
+passage 読解（support 0.91 vs 0.71）と b77 topic。つまり蒸留の使い道は前反復の結論どおり
+「gold の無い question」で、そこでの取り分は **question 種による**: 読解系は教師、感情系は student。
+教師の OOD ラベル 300 state は 0.16 req/s で 31 分（p50 11 s、前回の 47 s より lane が空いていた）。
+
+### 判断 → 承認キュー（`wire.py to_kaizen_issue`）
+
+proposal を cloud-itonami の kaizen ingress の形（`{:kind :id :title :body :severity}`、id = memo-key
+の先頭 16 桁なので同じ判断は `200 already-open`）に落とす関数を足した。**POST はしていない**
+（narrow key では取り消せず、人が cockpit で閉じるまで残るので、実弾は governor 側の受け口を
+決めてから）。
+
+### 型で刈った候補列（未着手、理由）
+
+symbol-index に `.kotoba` の定義は 95 行しか無く（618k symbol 中）、kotoba-sema の型で候補を刈れる
+corpus が無い。code decision は当面「同 ns 近傍」の distractor で測る。

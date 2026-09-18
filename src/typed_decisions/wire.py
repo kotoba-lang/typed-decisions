@@ -63,3 +63,19 @@ def to_edn(p: dict) -> str:
             return "[" + " ".join(emit(x) for x in v) + "]"
         raise TypeError(type(v))
     return emit(p)
+
+
+def to_kaizen_issue(p: dict, org: str, repo: str) -> dict:
+    """The cloud-itonami approval-queue ingress shape (`POST https://itonami.cloud/api/<org>/<repo>/kaizen`,
+    bearer key from the Keychain item "cloud-itonami KAIZEN_INGRESS_KEY"; the same route kaiyu and
+    loop-noren use — {:kind :id :title :body :severity}). The id is the memo key, so the same decision
+    proposed twice answers `200 already-open` instead of queueing a duplicate. This function only
+    builds the payload; posting is a governed outbound send and is not done from here (a POST cannot
+    be withdrawn with the narrow key — a wrong one sits until a human closes it in the cockpit)."""
+    ref = p.get("reference", {})
+    adm = p.get("admit?", {})
+    body = (f"typed-decisions proposes wiring {p['definition']} -> {ref.get('fq')} (hash {ref.get('hash')}), "
+            f"confidence {p.get('confidence')}; admission noul {adm.get('noul')} vs threshold {adm.get('threshold')} -> {adm.get('decision')}. "
+            f"Distribution: {p['probabilities']}. This is a proposal, not an action: nothing was executed.")
+    return {"kind": "typed-decision", "id": f"td-{p['memo-key'][:16]}", "title": f"wire {p['definition']} -> {ref.get('fq')}",
+            "body": body, "severity": "low" if adm.get("decision") == "autonomous" else "medium", "org": org, "repo": repo}
