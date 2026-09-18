@@ -150,6 +150,40 @@ def ood_questions(e: Example, label_name: str | None = None) -> list[Question]:
     return []
 
 
+# ---- extra TRAIN question families on the same states (not the OOD test families): tests whether
+# question-side diversity on the same state — rather than more domains — moves OOD. Rule gold as above.
+HOWTO_KW = ("why", "how", "what", "can_", "supported", "limit", "age", "country", "estimate", "fee", "rate", "when", "where", "which")
+PROBLEM_KW = ("lost", "stolen", "compromised", "not_working", "declined", "failed", "wrong", "not_recognised", "dispute", "reverted", "pending", "not_updated", "not_arrived", "unable", "problem", "error")
+
+
+def train_families(e: Example, label_name: str | None = None) -> list[Question]:
+    i, split = e.meta.get("i"), e.meta.get("split")
+    if e.source == "banking77" and label_name:
+        n = label_name.lower()
+        howto = any(k in n for k in HOWTO_KW) and not any(k in n for k in PROBLEM_KW)
+        problem = any(k in n for k in PROBLEM_KW)
+        kind = 0 if problem else (1 if howto else 2)
+        return [
+            Question(f"tf-b77-{split}-{i}-kind", "choice", "What kind of message is this?", ["a report of something that went wrong", "a question about how something works or what is allowed", "a request to do or change something"], kind),
+            Question(f"tf-b77-{split}-{i}-problem", "noul", "Is the customer reporting a problem that has already happened?", list(NOUL_OPTIONS), int(problem)),
+            Question(f"tf-b77-{split}-{i}-severity", "score", "How serious is the situation described?", ["routine", "needs attention", "urgent"], 2 if any(k in n for k in ("lost", "stolen", "compromised", "not_recognised", "dispute")) else (1 if problem else 0)),
+        ]
+    if e.source == "sst5":
+        lev = e.questions[0].gold
+        return [
+            Question(f"tf-sst5-{split}-{i}-again", "score", "How likely is the reviewer to watch this again?", ["never", "unlikely", "maybe", "likely", "certainly"], lev),
+            Question(f"tf-sst5-{split}-{i}-mixed", "noul", "Is the review mixed or neutral rather than clearly positive or negative?", list(NOUL_OPTIONS), int(lev == 2)),
+            Question(f"tf-sst5-{split}-{i}-thumbs", "choice", "Thumbs up, thumbs down, or neither?", ["thumbs down", "neither", "thumbs up"], 0 if lev < 2 else (1 if lev == 2 else 2)),
+        ]
+    if e.source == "boolq":
+        q = e.questions[0]
+        return [
+            Question(f"tf-boolq-{split}-{i}-answer", "choice", "According to the passage, what is the answer to: " + q.instructions, ["no", "yes"], q.gold),
+            Question(f"tf-boolq-{split}-{i}-wrong", "noul", "Would answering 'yes' to the question be wrong given the passage? Question: " + q.instructions, list(NOUL_OPTIONS), 1 - q.gold),
+        ]
+    return []
+
+
 SOURCES = {
     "banking77": ("train", "test"),
     "sst5": ("train", "test"),
@@ -158,7 +192,7 @@ SOURCES = {
 LOADERS = {"banking77": _banking77, "sst5": _sst5, "boolq": _boolq}
 
 
-def build(out_dir: str, n_train: int, n_val: int, n_test: int, seed: int = 0) -> dict:
+def build(out_dir: str, n_train: int, n_val: int, n_test: int, seed: int = 0, extra_train_families: bool = False) -> dict:
     os.makedirs(out_dir, exist_ok=True)
     rng = random.Random(seed)
     train, val, test = [], [], []
@@ -174,6 +208,11 @@ def build(out_dir: str, n_train: int, n_val: int, n_test: int, seed: int = 0) ->
         test += te[:n_test]
         counts[src] = {"train": len(t), "val": len(v), "test": len(te[:n_test]),
                        "available_train": len(tr), "available_test": len(te)}
+    if extra_train_families:
+        # a second example per train state carrying the extra families (kept separate so the original
+        # example's packing, and therefore its tokens, is unchanged)
+        train += [Example(state=e.state, source=e.source, meta=dict(e.meta, families=True), questions=train_families(e, e.meta.get("label_name"))) for e in list(train)]
+        train = [e for e in train if e.questions]
     rng.shuffle(train)
     rng.shuffle(test)
     write_jsonl(os.path.join(out_dir, "train.jsonl"), train)
@@ -194,9 +233,10 @@ def main(argv=None):
     ap.add_argument("--n-val", type=int, default=400)
     ap.add_argument("--n-test", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--extra-train-families", action="store_true")
     a = ap.parse_args(argv)
     import json
-    print(json.dumps(build(a.out, a.n_train, a.n_val, a.n_test, a.seed), indent=1))
+    print(json.dumps(build(a.out, a.n_train, a.n_val, a.n_test, a.seed, a.extra_train_families), indent=1))
 
 
 if __name__ == "__main__":

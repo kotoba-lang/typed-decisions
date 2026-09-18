@@ -1,0 +1,263 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-hyouDXxJ2Wpz2573bbRVAp
+✓ Created objects.
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/m
+│   odal_app.py
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/s
+│   rc/typed_decisions
+├── 🔨 Created function data_remote.
+├── 🔨 Created function encoder_remote.
+└── 🔨 Created function dllm_remote.
+/usr/local/lib/python3.12/site-packages/transformers/convert_slow_tokenizer.py:566: UserWarning: The sentencepiece tokenizer that you are converting to a fast tokenizer uses the byte fallback option which is not implemented in the fast tokenizers. In practice this means that the fast version of the tokenizer can produce unknown tokens whereas the sentencepiece version would have converted these unknown tokens into a sequence of byte tokens matching the original piece of text.
+  warnings.warn(
+/usr/local/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+/root/typed_decisions/train_encoder.py:155: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  losses.append((step, float(loss), info["ce"], info["brier"]))
+step 0/3525 loss 2.1720 ce 1.4898 brier 0.6823 kl 0.0000 lr 1.90e-07
+step 50/3525 loss 1.7933 ce 1.2238 brier 0.5695 kl 0.0000 lr 4.93e-06
+step 100/3525 loss 1.2387 ce 0.8297 brier 0.4090 kl 0.0000 lr 9.67e-06
+step 150/3525 loss 1.2161 ce 0.8034 brier 0.4126 kl 0.0000 lr 1.44e-05
+step 200/3525 loss 1.0704 ce 0.6873 brier 0.3830 kl 0.0000 lr 1.91e-05
+step 250/3525 loss 0.8124 ce 0.5010 brier 0.3115 kl 0.0000 lr 1.98e-05
+step 300/3525 loss 1.6712 ce 1.0583 brier 0.6129 kl 0.0000 lr 1.95e-05
+step 350/3525 loss 0.7594 ce 0.4496 brier 0.3097 kl 0.0000 lr 1.92e-05
+step 400/3525 loss 0.9928 ce 0.6291 brier 0.3637 kl 0.0000 lr 1.89e-05
+step 450/3525 loss 0.7310 ce 0.4767 brier 0.2543 kl 0.0000 lr 1.86e-05
+step 500/3525 loss 0.8957 ce 0.5395 brier 0.3562 kl 0.0000 lr 1.82e-05
+step 550/3525 loss 0.5235 ce 0.3317 brier 0.1918 kl 0.0000 lr 1.79e-05
+step 600/3525 loss 0.8072 ce 0.4976 brier 0.3096 kl 0.0000 lr 1.76e-05
+step 650/3525 loss 0.6903 ce 0.4374 brier 0.2529 kl 0.0000 lr 1.73e-05
+step 700/3525 loss 0.8639 ce 0.5348 brier 0.3291 kl 0.0000 lr 1.70e-05
+step 750/3525 loss 0.8319 ce 0.5676 brier 0.2643 kl 0.0000 lr 1.67e-05
+step 800/3525 loss 0.6828 ce 0.4387 brier 0.2441 kl 0.0000 lr 1.64e-05
+step 850/3525 loss 0.7273 ce 0.4548 brier 0.2725 kl 0.0000 lr 1.61e-05
+step 900/3525 loss 0.7557 ce 0.5140 brier 0.2417 kl 0.0000 lr 1.58e-05
+step 950/3525 loss 0.3703 ce 0.2442 brier 0.1261 kl 0.0000 lr 1.55e-05
+step 1000/3525 loss 0.6820 ce 0.4288 brier 0.2532 kl 0.0000 lr 1.52e-05
+step 1050/3525 loss 0.7178 ce 0.4636 brier 0.2542 kl 0.0000 lr 1.49e-05
+step 1100/3525 loss 0.6455 ce 0.3858 brier 0.2596 kl 0.0000 lr 1.46e-05
+step 1150/3525 loss 0.9125 ce 0.6153 brier 0.2972 kl 0.0000 lr 1.43e-05
+step 1200/3525 loss 0.5407 ce 0.3468 brier 0.1940 kl 0.0000 lr 1.40e-05
+step 1250/3525 loss 0.8505 ce 0.5355 brier 0.3150 kl 0.0000 lr 1.37e-05
+step 1300/3525 loss 0.4498 ce 0.2815 brier 0.1683 kl 0.0000 lr 1.34e-05
+step 1350/3525 loss 0.9810 ce 0.6079 brier 0.3731 kl 0.0000 lr 1.31e-05
+step 1400/3525 loss 0.6726 ce 0.4178 brier 0.2548 kl 0.0000 lr 1.28e-05
+step 1450/3525 loss 0.2652 ce 0.1606 brier 0.1046 kl 0.0000 lr 1.25e-05
+step 1500/3525 loss 0.5576 ce 0.3461 brier 0.2115 kl 0.0000 lr 1.22e-05
+step 1550/3525 loss 1.1937 ce 0.7320 brier 0.4616 kl 0.0000 lr 1.19e-05
+step 1600/3525 loss 0.2054 ce 0.1321 brier 0.0733 kl 0.0000 lr 1.16e-05
+step 1650/3525 loss 0.3131 ce 0.2029 brier 0.1102 kl 0.0000 lr 1.13e-05
+step 1700/3525 loss 0.5452 ce 0.3786 brier 0.1666 kl 0.0000 lr 1.10e-05
+step 1750/3525 loss 0.7511 ce 0.5111 brier 0.2399 kl 0.0000 lr 1.07e-05
+step 1800/3525 loss 0.3517 ce 0.2130 brier 0.1387 kl 0.0000 lr 1.04e-05
+step 1850/3525 loss 1.4324 ce 0.9521 brier 0.4803 kl 0.0000 lr 1.01e-05
+step 1900/3525 loss 0.2700 ce 0.1649 brier 0.1051 kl 0.0000 lr 9.80e-06
+step 1950/3525 loss 0.6362 ce 0.3930 brier 0.2432 kl 0.0000 lr 9.50e-06
+step 2000/3525 loss 0.5914 ce 0.3744 brier 0.2170 kl 0.0000 lr 9.20e-06
+step 2050/3525 loss 0.7189 ce 0.4511 brier 0.2678 kl 0.0000 lr 8.90e-06
+step 2100/3525 loss 1.0742 ce 0.6825 brier 0.3917 kl 0.0000 lr 8.59e-06
+step 2150/3525 loss 0.5646 ce 0.3490 brier 0.2156 kl 0.0000 lr 8.29e-06
+step 2200/3525 loss 0.5873 ce 0.3614 brier 0.2259 kl 0.0000 lr 7.99e-06
+step 2250/3525 loss 0.3295 ce 0.2107 brier 0.1188 kl 0.0000 lr 7.69e-06
+step 2300/3525 loss 0.3389 ce 0.2164 brier 0.1225 kl 0.0000 lr 7.39e-06
+step 2350/3525 loss 0.4301 ce 0.2744 brier 0.1557 kl 0.0000 lr 7.09e-06
+step 2400/3525 loss 0.1969 ce 0.1352 brier 0.0617 kl 0.0000 lr 6.78e-06
+step 2450/3525 loss 0.5332 ce 0.3220 brier 0.2112 kl 0.0000 lr 6.48e-06
+step 2500/3525 loss 0.7356 ce 0.4462 brier 0.2894 kl 0.0000 lr 6.18e-06
+step 2550/3525 loss 0.1518 ce 0.0994 brier 0.0524 kl 0.0000 lr 5.88e-06
+step 2600/3525 loss 0.3171 ce 0.1988 brier 0.1183 kl 0.0000 lr 5.58e-06
+step 2650/3525 loss 0.4916 ce 0.3009 brier 0.1907 kl 0.0000 lr 5.27e-06
+step 2700/3525 loss 0.4526 ce 0.2909 brier 0.1617 kl 0.0000 lr 4.97e-06
+step 2750/3525 loss 0.5660 ce 0.3730 brier 0.1930 kl 0.0000 lr 4.67e-06
+step 2800/3525 loss 0.5218 ce 0.3330 brier 0.1888 kl 0.0000 lr 4.37e-06
+step 2850/3525 loss 0.8336 ce 0.5321 brier 0.3015 kl 0.0000 lr 4.07e-06
+step 2900/3525 loss 0.5911 ce 0.3621 brier 0.2290 kl 0.0000 lr 3.77e-06
+step 2950/3525 loss 0.3905 ce 0.2404 brier 0.1501 kl 0.0000 lr 3.46e-06
+step 3000/3525 loss 0.6797 ce 0.4133 brier 0.2664 kl 0.0000 lr 3.16e-06
+step 3050/3525 loss 0.3156 ce 0.2069 brier 0.1087 kl 0.0000 lr 2.86e-06
+step 3100/3525 loss 0.4950 ce 0.3322 brier 0.1628 kl 0.0000 lr 2.56e-06
+step 3150/3525 loss 0.5896 ce 0.4207 brier 0.1689 kl 0.0000 lr 2.26e-06
+step 3200/3525 loss 0.5586 ce 0.3502 brier 0.2084 kl 0.0000 lr 1.96e-06
+step 3250/3525 loss 0.9874 ce 0.6617 brier 0.3256 kl 0.0000 lr 1.65e-06
+step 3300/3525 loss 0.9252 ce 0.5826 brier 0.3426 kl 0.0000 lr 1.35e-06
+step 3350/3525 loss 0.3019 ce 0.1948 brier 0.1072 kl 0.0000 lr 1.05e-06
+step 3400/3525 loss 0.2277 ce 0.1485 brier 0.0792 kl 0.0000 lr 7.48e-07
+step 3450/3525 loss 0.3347 ce 0.2137 brier 0.1210 kl 0.0000 lr 4.47e-07
+step 3500/3525 loss 0.1262 ce 0.0941 brier 0.0321 kl 0.0000 lr 1.45e-07
+{
+ "backbone": "encoder",
+ "model": "microsoft/deberta-v3-large",
+ "args": {
+  "model": "microsoft/deberta-v3-large",
+  "data": "/cache/data-multi",
+  "out": "/cache/runs/encoder-20260918-104759",
+  "epochs": 1.0,
+  "batch": 16,
+  "lr": 2e-05,
+  "head_lr": 0.001,
+  "warmup": 0.06,
+  "brier_weight": 1.0,
+  "max_state": 256,
+  "max_len": 512,
+  "limit": 0,
+  "test_limit": 0,
+  "device": "cuda",
+  "eval_batch": 32,
+  "bench_n": "1,10",
+  "seed": 2,
+  "save": true,
+  "tiny": false,
+  "pool": "span",
+  "emit_proposals": 0,
+  "augment": 0.7,
+  "consistency": 0.0,
+  "no_amp": false,
+  "attn": "eager",
+  "reference_compile": "auto"
+ },
+ "device": "cuda",
+ "reference_compile": null,
+ "params_total": 437159937,
+ "data": {
+  "train_states": 56390,
+  "train_questions": 92390,
+  "test_states": 6877,
+  "test_questions": 12077,
+  "val_states": 2500
+ },
+ "autocast_bf16": true,
+ "metrics_train_subset": {
+  "ag_news/choice": {
+   "n": 8,
+   "acc": 1.0,
+   "brier": 0.0356905404926979,
+   "nll": 0.06324004594304382,
+   "ece": 0.051118582487106365,
+   "mean_conf": 0.9488814175128937
+  },
+  "all": {
+   "n": 325,
+   "acc": 0.9292307692307692,
+   "brier": 0.10148217911233465,
+   "nll": 0.20430646506197564,
+   "ece": 0.022617562825863195,
+   "mean_conf": 0.9343614113330841
+  },
+  "banking77/choice": {
+   "n": 56,
+   "acc": 0.8571428571428571,
+   "brier": 0.20330438819988994,
+   "nll": 0.49389995421851907,
+   "ece": 0.08301108383706636,
+   "mean_conf": 0.9317698068916798
+  },
+  "banking77/noul": {
+   "n": 28,
+   "acc": 0.9285714285714286,
+   "brier": 0.11187426844152563,
+   "nll": 0.2180508674386618,
+   "ece": 0.04825799167156226,
+   "mean_conf": 0.9700906042541776,
+   "noul_brier": 0.055937134122556784
+  },
+  "boolq/noul": {
+   "n": 14,
+   "acc": 1.0,
+   "brier": 0.010614366427393601,
+   "nll": 0.05699159789973775,
+   "ece": 0.05410787463188174,
+   "mean_conf": 0.9458921253681183,
+   "noul_brier": 0.005307184084810296
+  },
+  "clinc/choice": {
+   "n": 13,
+   "acc": 1.0,
+   "brier": 0.00013228274956724175,
+   "nll": 0.0028539202780729018,
+   "ece": 0.002820225862356307,
+   "mean_conf": 0.9971797741376437
+  },
+  "clinc/noul": {
+   "n": 13,
+   "acc": 1.0,
+   "brier": 2.6508991226655678e-05,
+   "nll": 0.002886149739447043,
+   "ece": 0.0028794958041264973,
+   "mean_conf": 0.9971205041958735,
+   "noul_brier": 1.3254469733160986e-05
+  },
+  "cola/noul": {
+   "n": 11,
+   "acc": 1.0,
+   "brier": 0.034481964335549946,
+   "nll": 0.10948093989642661,
+   "ece": 0.09893456372347746,
+   "mean_conf": 0.9010654362765226,
+   "noul_brier": 0.017240982189016
+  },
+  "counterfactual/noul": {
+   "n": 15,
+   "acc": 1.0,
+   "brier": 0.006119170290430355,
+   "nll": 0.03232195510901825,
+   "ece": 0.030653202533721925,
+   "mean_conf": 0.969346797466278,
+   "noul_brier": 0.003059586059364092
+  },
+  "dbpedia/choice": {
+   "n": 9,
+   "acc": 1.0,
+   "brier": 5.1014403897959264e-05,
+   "nll": 0.0029216478636278436,
+   "ece": 0.0029031038284301758,
+   "mean_conf": 0.9970968961715698
+  },
+  "emotion/choice": {
+   "n": 13,
+   "acc": 1.0,
+   "brier": 0.009806773743042514,
+   "nll": 0.041635888060221955,
+   "ece": 0.03789341908234819,
+   "mean_conf": 0.9621065809176519
+  },
+  "emotion/noul": {
+   "n": 13,
+   "acc": 1.0,
+   "brier": 0.00011398071329128737,
+   "nll": 0.005111605851310406,
+   "ece": 0.005082804423112153,
+   "mean_conf": 0.9949171955768878,
+   "noul_brier": 5.699040454893588e-05
+  },
+  "imdb/noul": {
+   "n": 14,
+   "acc": 0.9285714285714286,
+   "brier": 0.11377275077564293,
+   "nll": 0.16592535247676837,
+   "ece": 0.07073882647923059,
+   "mean_conf": 0.9852341754095895,
+   "noul_brier": 0.05688637782925219
+  },
+  "kind=choice": {
+   "n": 118,
+   "acc": 0.923728813559322,
+   "brier": 0.11259339612702896,
+   "nll": 0.2685764910498095,
+   "ece": 0.043968603520070114,
+   "mean_conf": 0.9427254601555356
+  },
+  "kind=noul": {
+   "n": 183,
+   "acc": 0.9617486338797814,
+   "brier": 0.06495124419301321,
+   "nll": 0.11982182129495239,
+   "ece": 0.012617885415019953,
+   "mean_conf": 0.961
+saved reports/multi-deb-large-1ep-20260918-200007.json
+✓ App completed. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-hyouDXxJ2Wpz2573bbRVAp

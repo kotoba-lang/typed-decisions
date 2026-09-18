@@ -443,3 +443,39 @@ m.decide(state, [{"type": "choice", "instructions": "...", "options": [...]}, {"
 
 ModernBERT-base 版（`pub-open-jev-modernbert-base`、augment 0.7、2 ep）は **0.504 に崩れた**（augment 無し 2 ep は 0.728）——
 ModernBERT-base の run 間不安定の 4 例目。公開しない。
+
+## コミット 1（2026-09-18）: 幅（16 family）と question 側の多様性 —— OOD の見積りは外れた
+
+「公開 dataset 10 種で OOD 0.69 → 0.75」という見立てを 2 つの実験で測った。どちらも DeBERTa-v3-large、
+augment 0.7、1 ep。
+
+**A. 幅（`data_multi.py`、13 dataset × 3k state = MNLI / RTE / QNLI / MRPC / PAWS / CoLA / emotion / CLINC 20-way /
+AG News / DBpedia / Yelp stars / IMDB / counterfactual、計 16 family、56k state / 92k question、$0.70）**
+
+| | 元 3 source の in-domain | 新 13 family の in-domain | **OOD（固定 set）** |
+|---|---|---|---|
+| 3 family（公開版） | 0.854 / ECE 0.022 | — | **0.690** |
+| 16 family seed 2 | **0.865 / ECE 0.009** | 0.78〜0.99（MNLI 0.87、PAWS 0.93、DBpedia 0.99、CoLA 0.78、Yelp 0.79） | 0.669 |
+| 16 family seed 0 | 0.860 / ECE 0.014 | — | 0.670 |
+
+**B. 同じ state に question 側の多様性（`data.py --extra-train-families`、元 3 source の train state に別の規則 gold
+family を 2〜3 問ずつ追加、42k → 90k question、$0.47。test / OOD は全 3,000 state で比較）**
+
+| | in-domain | OOD | b77 outflow | boolq support | sst5 score |
+|---|---|---|---|---|---|
+| baseline（全 test） | 0.860 | 0.667 | 0.74 | 0.60 | 0.46 |
+| + train families | 0.860 | **0.670** | 0.81 | 0.75 | 0.37 |
+
+結論: **どちらも OOD 合計を動かさない**（±0.5 pt、seed spread 0.025 の中）。family 別には ±10 pt 動くが方向が
+ばらばらで、合計では相殺する。幅は in-domain と較正（ECE 0.022 → 0.009）を上げ、新 family はどれも訓練に
+入れば 0.78〜0.99 になる —— **「訓練に入れた question は読める、入れていない question は 0.67 前後」**が
+この model class（435M encoder、1 forward）の今の形で、私の「5 コミットで 0.8」は外れ。正しい見立ては下の
+「見積りの訂正」。
+
+16 family 版は HF の同 repo に **revision `multi-16`** として公開（card にこの比較を書いた）。`main` は 3 family 版のまま。
+
+### 見積りの訂正
+- **あなたの question family を訓練に入れる**: 1 family あたり数千 state の gold（または教師ラベル）で 1 コミット、
+  in-domain 0.8〜0.99 に届く（今日 13 family が全部そうなった）。これが「精度が高くなる」の実際の経路。
+- **未見の question を読む力（OOD 合計）**: 今日試した 2 lever では動かない。動かす候補は backbone を 1 段上げる
+  （fleet に載る architecture で）か、OOD family 自体に教師ラベルを付けて in-domain 化するか。後者は結局 1 と同じ。

@@ -1,0 +1,78 @@
+{
+ "base": {
+  "train": 18000,
+  "test": 3000
+ },
+ "mnli": {
+  "train": 3000,
+  "test": 300,
+  "questions": 6200
+ },
+ "rte": {
+  "train": 2390,
+  "test": 277,
+  "questions": 2490
+ },
+ "qnli": {
+  "train": 3000,
+  "test": 300,
+  "questions": 3100
+ },
+ "mrpc": {
+  "train": 3000,
+  "test": 300,
+  "questions": 3100
+ },
+ "paws": {
+  "train": 3000,
+  "test": 300,
+  "questions": 3100
+ },
+ "cola": {
+  "train": 3000,
+  "test": 300,
+  "questions": 3100
+ },
+ "emotion": {
+  "train": 3000,
+  "test": 300,
+  "questions": 6200
+ },
+ "clinc": {
+  "train": 3000,
+  "test": 300,
+  "questions": 6200
+ },
+ "ag_news": {
+  "train": 3000,
+  "test": 300,
+  "questions": 3100
+ },
+ "dbpedia": {
+  "train": 3000,
+  "test": 300,
+  "questions": 3100
+ },
+ "yelp": {
+  "train": 3000,
+  "test": 300,
+  "questions": 6200
+ },
+ "imdb": {
+  "train": 3000,
+  "test": 300,
+  "questions": 3100
+ },
+ "counterfactual": {
+  "train": 3000,
+  "test": 300,
+  "questions": 3100
+ },
+ "total": {
+  "train_states": 56390,
+  "train_questions": 92390,
+  "val": 2500,
+  "test_states": 6877,
+  "families": 16
+ }
+}

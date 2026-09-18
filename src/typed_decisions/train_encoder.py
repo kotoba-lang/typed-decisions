@@ -182,12 +182,15 @@ def main(argv=None) -> dict:
         trec = predict(model, coll, test, a.eval_batch, dev, temperature=1.0)
     rep["eval_wall_s"] = time.time() - t1
     rep["metrics_T1"] = summarize(trec)
+    base_sources = {"banking77", "sst5", "boolq"}
+    rep["metrics_base_T1"] = summarize([r for r in trec if r["source"] in base_sources])
     import numpy as np
     for r in trec:
         z = np.asarray(r["logits"]) / T
         z = np.exp(z - z.max())
         r["probs"] = (z / z.sum()).tolist()
     rep["metrics_Tfit"] = summarize(trec)
+    rep["metrics_base_Tfit"] = summarize([r for r in trec if r["source"] in base_sources])
 
     # OOD questions (never-seen instructions and option sets on the same test states): reads the question or memorised the slot?
     ood_path = os.path.join(a.data, "ood-test.jsonl")
