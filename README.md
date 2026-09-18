@@ -426,3 +426,20 @@ provenance）。owner が回すなら:
 cd orgs/kotoba-lang/typed-decisions && .venv/bin/python -m typed_decisions.hermes_data --out data-hermes
 ```
 出力の `summary.json` に「検証付き triple の数」と profile 別 terminal 成功率が出る —— 成長速度の指標の初値。
+
+## 公開 model（2026-09-18）
+
+**https://huggingface.co/com-kotobalabs/open-jev-deberta-v3-large**（Apache-2.0、public）—— DeBERTa-v3-large、
+augment p=0.7、seed 2、1 ep。in-domain **0.854** / ECE 0.022、OOD **0.690** / ECE 0.035（`reports/pub-open-jev-deberta-v3-large-*.json`）。
+bundle = backbone（HF 形式）+ `head.safetensors` + marker 付き tokenizer + `open_jev_config.json`（pool / 温度 / 学習来歴 /
+実測値）+ `typed_decisions/{schema,encoder,open_jev}.py`（loader を同梱、`pip install` 無しで動く）。Hub からの
+round trip（clean dir に snapshot → `OpenJev.from_pretrained` → decide）を確認。M1 Max CPU fp32 で 4 question 1.8 s。
+
+```python
+from typed_decisions.open_jev import OpenJev
+m = OpenJev.from_pretrained("com-kotobalabs/open-jev-deberta-v3-large")
+m.decide(state, [{"type": "choice", "instructions": "...", "options": [...]}, {"type": "score", ...}, {"type": "noul", "instructions": "..."}])
+```
+
+ModernBERT-base 版（`pub-open-jev-modernbert-base`、augment 0.7、2 ep）は **0.504 に崩れた**（augment 無し 2 ep は 0.728）——
+ModernBERT-base の run 間不安定の 4 例目。公開しない。

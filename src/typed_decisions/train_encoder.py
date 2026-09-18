@@ -249,7 +249,18 @@ def main(argv=None) -> dict:
     with open(os.path.join(a.out, "report.json"), "w") as f:
         json.dump(rep, f, indent=1)
     if a.save:
-        torch.save(model.state_dict(), os.path.join(a.out, "model.pt"))
+        # a loadable bundle: backbone in HF format, the head + markers + pool + temperature beside it
+        bdir = os.path.join(a.out, "bundle")
+        os.makedirs(bdir, exist_ok=True)
+        model.backbone.save_pretrained(bdir, safe_serialization=True)
+        tok.save_pretrained(bdir)
+        from safetensors.torch import save_file
+        save_file({k: v.detach().cpu().contiguous() for k, v in model.head.state_dict().items()}, os.path.join(bdir, "head.safetensors"))
+        with open(os.path.join(bdir, "open_jev_config.json"), "w") as f:
+            json.dump({"pool": model.pool, "temperature": float(model.temperature), "markers": ["[STATE]", "[Q]", "[OPT]"], "max_state_tokens": a.max_state,
+                       "max_len": a.max_len, "hidden": model.backbone.config.hidden_size, "base_model": a.model, "attn_implementation": a.attn,
+                       "train": {"states": rep["data"]["train_states"], "questions": rep["data"]["train_questions"], "epochs": a.epochs, "augment": a.augment, "seed": a.seed},
+                       "metrics": {"in_domain": rep["metrics_Tfit"]["all"], "ood": rep.get("metrics_ood_Tfit", {}).get("all")}}, f, indent=1)
     print(json.dumps({k: v for k, v in rep.items() if k not in ("train",)}, indent=1)[:4000])
     return rep
 
