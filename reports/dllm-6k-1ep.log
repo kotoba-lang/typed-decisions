@@ -1,0 +1,236 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-sA6FP3cp8r72EuGgX2chlO
+✓ Created objects.
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/m
+│   odal_app.py
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/s
+│   rc/typed_decisions
+├── 🔨 Created function data_remote.
+├── 🔨 Created function encoder_remote.
+└── 🔨 Created function dllm_remote.
+`torch_dtype` is deprecated! Use `dtype` instead!
+
+[1ALoading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]
+[1ALoading checkpoint shards:  33%|███▎      | 1/3 [00:01<00:02,  1.25s/it]
+[1ALoading checkpoint shards:  67%|██████▋   | 2/3 [00:02<00:01,  1.32s/it]
+[1ALoading checkpoint shards: 100%|██████████| 3/3 [00:17<00:00,  7.50s/it]
+[1ALoading checkpoint shards: 100%|██████████| 3/3 [00:17<00:00,  5.82s/it]
+Please note that, unlike autoregressive models, LLaDA MoE employs a bidirectional attention mechanism. In the forward code in modeling_lladamoe.py, we set both attention_mask and causal_mask to None, which affects the default causal attention and causes the input attention_mask parameter to become ineffective. If you pass an attention mask and expect the model to use it for computing other attention mechanisms, it may lead to logits and aux_loss returned by the model being inconsistent with your expectations. 
+/root/typed_decisions/train_dllm.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  acc_loss += float(loss) / a.grad_accum
+step 0/750 loss 1.8272 ce 1.2753 brier 0.5519 lr 4.44e-06
+step 20/750 loss 0.8405 ce 0.5436 brier 0.2969 lr 4.89e-05
+step 40/750 loss 1.0094 ce 0.6353 brier 0.3741 lr 9.33e-05
+step 60/750 loss 0.4562 ce 0.2930 brier 0.1632 lr 9.77e-05
+step 80/750 loss 1.0361 ce 0.6618 brier 0.3743 lr 9.49e-05
+step 100/750 loss 0.4897 ce 0.3251 brier 0.1646 lr 9.21e-05
+step 120/750 loss 1.7368 ce 1.1198 brier 0.6169 lr 8.92e-05
+step 140/750 loss 0.5070 ce 0.3448 brier 0.1622 lr 8.64e-05
+step 160/750 loss 1.3342 ce 0.9488 brier 0.3854 lr 8.35e-05
+step 180/750 loss 0.4094 ce 0.2738 brier 0.1356 lr 8.07e-05
+step 200/750 loss 0.4323 ce 0.2730 brier 0.1593 lr 7.79e-05
+step 220/750 loss 1.9592 ce 1.4499 brier 0.5092 lr 7.50e-05
+step 240/750 loss 0.8206 ce 0.5843 brier 0.2362 lr 7.22e-05
+step 260/750 loss 0.8203 ce 0.5398 brier 0.2805 lr 6.94e-05
+step 280/750 loss 0.4194 ce 0.2731 brier 0.1464 lr 6.65e-05
+step 300/750 loss 1.4344 ce 0.9981 brier 0.4362 lr 6.37e-05
+step 320/750 loss 0.2732 ce 0.1821 brier 0.0911 lr 6.09e-05
+step 340/750 loss 1.3190 ce 0.9656 brier 0.3534 lr 5.80e-05
+step 360/750 loss 1.6449 ce 1.1180 brier 0.5269 lr 5.52e-05
+step 380/750 loss 0.3407 ce 0.2100 brier 0.1306 lr 5.23e-05
+step 400/750 loss 0.2654 ce 0.1733 brier 0.0921 lr 4.95e-05
+step 420/750 loss 1.5453 ce 0.9682 brier 0.5771 lr 4.67e-05
+step 440/750 loss 0.5328 ce 0.3695 brier 0.1633 lr 4.38e-05
+step 460/750 loss 1.3220 ce 0.8847 brier 0.4373 lr 4.10e-05
+step 480/750 loss 0.0699 ce 0.0545 brier 0.0154 lr 3.82e-05
+step 500/750 loss 0.1672 ce 0.1092 brier 0.0580 lr 3.53e-05
+step 520/750 loss 0.4696 ce 0.3153 brier 0.1543 lr 3.25e-05
+step 540/750 loss 1.1595 ce 0.7475 brier 0.4119 lr 2.96e-05
+step 560/750 loss 0.1611 ce 0.1032 brier 0.0580 lr 2.68e-05
+step 580/750 loss 0.3767 ce 0.2427 brier 0.1340 lr 2.40e-05
+step 600/750 loss 0.7352 ce 0.4425 brier 0.2927 lr 2.11e-05
+step 620/750 loss 1.0499 ce 0.6859 brier 0.3641 lr 1.83e-05
+step 640/750 loss 0.3246 ce 0.2185 brier 0.1060 lr 1.55e-05
+step 660/750 loss 1.2216 ce 0.7671 brier 0.4545 lr 1.26e-05
+step 680/750 loss 0.3011 ce 0.1955 brier 0.1057 lr 9.79e-06
+step 700/750 loss 0.4118 ce 0.2631 brier 0.1487 lr 6.95e-06
+step 720/750 loss 1.4854 ce 1.0766 brier 0.4088 lr 4.11e-06
+step 740/750 loss 0.7621 ce 0.5146 brier 0.2475 lr 1.28e-06
+{
+ "backbone": "dllm",
+ "model": "inclusionAI/LLaDA-MoE-7B-A1B-Instruct",
+ "args": {
+  "model": "inclusionAI/LLaDA-MoE-7B-A1B-Instruct",
+  "data": "/cache/data",
+  "out": "/cache/runs/dllm-20260918-054637",
+  "epochs": 1.0,
+  "batch": 8,
+  "grad_accum": 1,
+  "lr": 0.0001,
+  "warmup": 0.06,
+  "brier_weight": 1.0,
+  "max_state": 512,
+  "lora_r": 16,
+  "lora_alpha": 32,
+  "no_lora": false,
+  "limit": 6000,
+  "test_limit": 1500,
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "eval_batch": 8,
+  "bench_n": "1,10,100",
+  "eval_steps": "1,2",
+  "skip_zero_shot": false,
+  "seed": 0,
+  "tiny": false
+ },
+ "device": "cuda",
+ "alphabet_size": 240,
+ "mask_id": 156895,
+ "params_total": 7356880896,
+ "data": {
+  "train_states": 6000,
+  "train_questions": 14020,
+  "test_states": 1500,
+  "test_questions": 3508,
+  "val_states": 375
+ },
+ "metrics_zero_shot_steps1": {
+  "all": {
+   "n": 3508,
+   "acc": 0.644811858608894,
+   "brier": 0.4934565157842974,
+   "nll": 1.113199601100794,
+   "ece": 0.0850613439411027,
+   "mean_conf": 0.7294108788169572
+  },
+  "banking77/choice": {
+   "n": 996,
+   "acc": 0.5020080321285141,
+   "brier": 0.6916644772348244,
+   "nll": 2.156834565472331,
+   "ece": 0.1606652451507059,
+   "mean_conf": 0.66267327727922
+  },
+  "banking77/noul": {
+   "n": 498,
+   "acc": 0.6807228915662651,
+   "brier": 0.4344495453891349,
+   "nll": 0.6264224061539582,
+   "ece": 0.08556153927462166,
+   "mean_conf": 0.7194032695398752,
+   "noul_brier": 0.21722477771399096
+  },
+  "boolq/noul": {
+   "n": 496,
+   "acc": 0.8286290322580645,
+   "brier": 0.24003459576296662,
+   "nll": 0.3729719126496784,
+   "ece": 0.04200568362589807,
+   "mean_conf": 0.8528629252987523,
+   "noul_brier": 0.12001729749698961
+  },
+  "kind=choice": {
+   "n": 1502,
+   "acc": 0.5818908122503329,
+   "brier": 0.5872465599659706,
+   "nll": 1.6606009081658155,
+   "ece": 0.12975229314973605,
+   "mean_conf": 0.7116431054000689
+  },
+  "kind=noul": {
+   "n": 1500,
+   "acc": 0.764,
+   "brier": 0.3478643519572755,
+   "nll": 0.5413806378650118,
+   "ece": 0.0745728484392166,
+   "mean_conf": 0.792302387992541,
+   "noul_brier": 0.17393217908524408
+  },
+  "kind=score": {
+   "n": 506,
+   "acc": 0.4782608695652174,
+   "brier": 0.6466493999338225,
+   "nll": 1.1834203158083254,
+   "ece": 0.1174542225102191,
+   "mean_conf": 0.5957150920754365,
+   "score_mae": 0.6225989881084805
+  },
+  "source=banking77": {
+   "n": 1494,
+   "acc": 0.5615796519410977,
+   "brier": 0.6059261666195945,
+   "nll": 1.6466971790328735,
+   "ece": 0.12000362275834064,
+   "mean_conf": 0.6815832746994384
+  },
+  "source=boolq": {
+   "n": 496,
+   "acc": 0.8286290322580645,
+   "brier": 0.24003459576296662,
+   "nll": 0.3729719126496784,
+   "ece": 0.04200568362589807,
+   "mean_conf": 0.8528629252987523,
+   "noul_brier": 0.12001729749698961
+  },
+  "source=sst5": {
+   "n": 1518,
+   "acc": 0.6666666666666666,
+   "brier": 0.46556956847378766,
+   "nll": 0.8300029950673461,
+   "ece": 0.07350298031006247,
+   "mean_conf": 0.7361448877079999
+  },
+  "sst5/choice": {
+   "n": 506,
+   "acc": 0.7391304347826086,
+   "brier": 0.3817124777529701,
+   "nll": 0.6838247763925158,
+   "ece": 0.08086340983394576,
+   "mean_conf": 0.8080343085786571
+  },
+  "sst5/noul": {
+   "n": 506,
+   "acc": 0.782608695652174,
+   "brier": 0.3683468277345704,
+   "nll": 0.6227638930011976,
+   "ece": 0.14718878186738538,
+   "mean_conf": 0.8046852624699061,
+   "noul_brier": 0.18417341851342245
+  },
+  "sst5/score": {
+   "n": 506,
+   "acc": 0.4782608695652174,
+   "brier": 0.6466493999338225,
+   "nll": 1.1834203158083254,
+   "ece": 0.1174542225102191,
+   "mean_conf": 0.5957150920754365,
+   "score_mae": 0.6225989881084805
+  },
+  "_eval_wall_s": 53.0601806640625
+ },
+ "lora_targets": [
+  "down_proj",
+  "gate_proj",
+  "k_proj",
+  "o_proj",
+  "q_proj",
+  "up_proj",
+  "v_proj"
+ ],
+ "params_trainable": 155189248,
+ "temperature": 1.0,
+ "metrics_trained_steps1_T1": {
+  "all": {
+   "n": 3508,
+   "acc": 0.8349486887115165,
+   "brier": 0.23099619888640036,
+   "nll": 0.4384919850682241,
+   "ece":
+saved reports/dllm-6k-1ep-20260918-153725.json
+✓ App completed. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-sA6FP3cp8r72EuGgX2chlO

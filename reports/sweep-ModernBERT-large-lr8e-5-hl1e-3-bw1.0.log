@@ -1,0 +1,191 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-QGN1qS1tRQL03r81AeSDTF
+✓ Created objects.
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/m
+│   odal_app.py
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/s
+│   rc/typed_decisions
+├── 🔨 Created function data_remote.
+├── 🔨 Created function encoder_remote.
+└── 🔨 Created function dllm_remote.
+The new embeddings will be initialized from a multivariate normal distribution that has old embeddings' mean and covariance. As described in this article: https://nlp.stanford.edu/~johnhew/vocab-expansion.html. To disable this, use `mean_resizing=False`
+/root/typed_decisions/train_encoder.py:115: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  losses.append((step, float(loss), info["ce"], info["brier"]))
+step 0/188 loss 2.4709 ce 1.7481 brier 0.7229 lr 1.45e-05
+step 50/188 loss 2.3202 ce 1.6384 brier 0.6818 lr 6.19e-05
+step 100/188 loss 2.3147 ce 1.6369 brier 0.6779 lr 3.93e-05
+step 150/188 loss 2.2553 ce 1.6163 brier 0.6391 lr 1.67e-05
+{
+ "backbone": "encoder",
+ "model": "answerdotai/ModernBERT-large",
+ "args": {
+  "model": "answerdotai/ModernBERT-large",
+  "data": "/cache/data",
+  "out": "/cache/runs/encoder-20260918-060343",
+  "epochs": 1.0,
+  "batch": 16,
+  "lr": 8e-05,
+  "head_lr": 0.001,
+  "warmup": 0.06,
+  "brier_weight": 1.0,
+  "max_state": 512,
+  "limit": 3000,
+  "test_limit": 600,
+  "device": "cuda",
+  "eval_batch": 32,
+  "bench_n": "1,10,100",
+  "seed": 0,
+  "save": false,
+  "tiny": false
+ },
+ "device": "cuda",
+ "params_total": 395835393,
+ "data": {
+  "train_states": 3000,
+  "train_questions": 6970,
+  "test_states": 600,
+  "test_questions": 1408,
+  "val_states": 150
+ },
+ "temperature": 1.3,
+ "eval_wall_s": 2.451496124267578,
+ "metrics_T1": {
+  "all": {
+   "n": 1408,
+   "acc": 0.3934659090909091,
+   "brier": 0.6768037633061773,
+   "nll": 1.6093114135390183,
+   "ece": 0.04582936263283377,
+   "mean_conf": 0.4196861110024408
+  },
+  "banking77/choice": {
+   "n": 404,
+   "acc": 0.12376237623762376,
+   "brier": 0.9336780442661428,
+   "nll": 3.283115038186794,
+   "ece": 0.0027157124869599085,
+   "mean_conf": 0.1264780887245837
+  },
+  "banking77/noul": {
+   "n": 202,
+   "acc": 0.6782178217821783,
+   "brier": 0.439223143052861,
+   "nll": 0.6314974987438472,
+   "ece": 0.03343977078352822,
+   "mean_conf": 0.7116575925657065,
+   "noul_brier": 0.21961157189038943
+  },
+  "boolq/noul": {
+   "n": 196,
+   "acc": 0.6173469387755102,
+   "brier": 0.49259419577191427,
+   "nll": 0.6894724648748741,
+   "ece": 0.12065608829868084,
+   "mean_conf": 0.6870848737200912,
+   "noul_brier": 0.2462970986687755
+  },
+  "kind=choice": {
+   "n": 606,
+   "acc": 0.2145214521452145,
+   "brier": 0.835601477442833,
+   "nll": 2.538664342914501,
+   "ece": 0.022572786882273817,
+   "mean_conf": 0.23709423902748836
+  },
+  "kind=noul": {
+   "n": 600,
+   "acc": 0.6333333333333333,
+   "brier": 0.47287648248360803,
+   "nll": 0.6669436700720816,
+   "ece": 0.06704017897446954,
+   "mean_conf": 0.6487702105442683,
+   "noul_brier": 0.23643824199023628
+  },
+  "kind=score": {
+   "n": 202,
+   "acc": 0.21782178217821782,
+   "brier": 0.8061352173988918,
+   "nll": 1.6203647347203034,
+   "ece": 0.06919212432781066,
+   "mean_conf": 0.2870139065060285,
+   "score_mae": 1.1869314293755162
+  },
+  "source=banking77": {
+   "n": 606,
+   "acc": 0.3085808580858086,
+   "brier": 0.7688597438617155,
+   "nll": 2.399242525039145,
+   "ece": 0.012957065252482679,
+   "mean_conf": 0.3215379233382913
+  },
+  "source=boolq": {
+   "n": 196,
+   "acc": 0.6173469387755102,
+   "brier": 0.49259419577191427,
+   "nll": 0.6894724648748741,
+   "ece": 0.12065608829868084,
+   "mean_conf": 0.6870848737200912,
+   "noul_brier": 0.2462970986687755
+  },
+  "source=sst5": {
+   "n": 606,
+   "acc": 0.40594059405940597,
+   "brier": 0.6443271148244272,
+   "nll": 1.1168859686035324,
+   "ece": 0.05503664404252181,
+   "mean_conf": 0.43134889026286183
+  },
+  "sst5/choice": {
+   "n": 202,
+   "acc": 0.39603960396039606,
+   "brier": 0.6394483437962132,
+   "nll": 1.0497629523699152,
+   "ece": 0.06228693567290164,
+   "mean_conf": 0.45832653963329767
+  },
+  "sst5/noul": {
+   "n": 202,
+   "acc": 0.6039603960396039,
+   "brier": 0.48739778327817673,
+   "nll": 0.6805302187203783,
+   "ece": 0.0552541713903446,
+   "mean_conf": 0.5487062246492593,
+   "noul_brier": 0.24369889273862916
+  },
+  "sst5/score": {
+   "n": 202,
+   "acc": 0.21782178217821782,
+   "brier": 0.8061352173988918,
+   "nll": 1.6203647347203034,
+   "ece": 0.06919212432781066,
+   "mean_conf": 0.2870139065060285,
+   "score_mae": 1.1869314293755162
+  }
+ },
+ "metrics_Tfit": {
+  "all": {
+   "n": 1408,
+   "acc": 0.3934659090909091,
+   "brier": 0.6741804250656969,
+   "nll": 1.6033622144863307,
+   "ece": 0.032760079225120926,
+   "mean_conf": 0.3939777251315656
+  },
+  "banking77/choice": {
+   "n": 404,
+   "acc": 0.12376237623762376,
+   "brier": 0.9329831348830154,
+   "nll": 3.2751430315711225,
+   "ece": 0.02047333139019476,
+   "mean_conf": 0.10804792393841084
+  },
+  "banking77/noul": {
+   "n": 202,
+   "acc": 0.67821
+saved reports/sweep-ModernBERT-large-lr8e-5-hl1e-3-bw1.0-20260918-150501.json
+✓ App completed. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-QGN1qS1tRQL03r81AeSDTF

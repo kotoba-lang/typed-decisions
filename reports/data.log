@@ -1,0 +1,45 @@
+✓ Initialized. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-nqnr1Q2I90MQQRIGRJJz8k
+✓ Created objects.
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/m
+│   odal_app.py
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/s
+│   rc/typed_decisions
+├── 🔨 Created function data_remote.
+├── 🔨 Created function encoder_remote.
+└── 🔨 Created function dllm_remote.
+Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+{
+ "banking77": {
+  "train": 6000,
+  "val": 400,
+  "test": 1000,
+  "available_train": 9993,
+  "available_test": 3076
+ },
+ "sst5": {
+  "train": 6000,
+  "val": 400,
+  "test": 1000,
+  "available_train": 8544,
+  "available_test": 2210
+ },
+ "boolq": {
+  "train": 6000,
+  "val": 400,
+  "test": 1000,
+  "available_train": 9427,
+  "available_test": 3270
+ },
+ "questions": {
+  "train": 42000,
+  "val": 2800,
+  "test": 7000
+ }
+}
+Stopping app - local entrypoint completed.
+✓ App completed. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-nqnr1Q2I90MQQRIGRJJz8k

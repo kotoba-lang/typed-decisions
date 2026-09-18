@@ -1,0 +1,234 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-SvkjF8cVclCAQVo03Uv0MK
+✓ Created objects.
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/m
+│   odal_app.py
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/s
+│   rc/typed_decisions
+├── 🔨 Created function data_remote.
+├── 🔨 Created function encoder_remote.
+└── 🔨 Created function dllm_remote.
+The new embeddings will be initialized from a multivariate normal distribution that has old embeddings' mean and covariance. As described in this article: https://nlp.stanford.edu/~johnhew/vocab-expansion.html. To disable this, use `mean_resizing=False`
+/root/typed_decisions/train_encoder.py:123: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  losses.append((step, float(loss), info["ce"], info["brier"]))
+step 0/2250 loss 2.5194 ce 1.7855 brier 0.7340 lr 7.41e-07
+step 50/2250 loss 2.3797 ce 1.6906 brier 0.6891 lr 1.93e-05
+step 100/2250 loss 2.0780 ce 1.4408 brier 0.6372 lr 3.78e-05
+step 150/2250 loss 2.4079 ce 1.6952 brier 0.7126 lr 4.96e-05
+step 200/2250 loss 1.9420 ce 1.2990 brier 0.6430 lr 4.84e-05
+step 250/2250 loss 1.8349 ce 1.1961 brier 0.6388 lr 4.73e-05
+step 300/2250 loss 1.7928 ce 1.1717 brier 0.6211 lr 4.61e-05
+step 350/2250 loss 1.5510 ce 0.9876 brier 0.5634 lr 4.49e-05
+step 400/2250 loss 1.7503 ce 1.2202 brier 0.5302 lr 4.37e-05
+step 450/2250 loss 1.6615 ce 1.0740 brier 0.5875 lr 4.25e-05
+step 500/2250 loss 1.4453 ce 0.9606 brier 0.4847 lr 4.13e-05
+step 550/2250 loss 1.3816 ce 0.8973 brier 0.4843 lr 4.02e-05
+step 600/2250 loss 0.9940 ce 0.6258 brier 0.3682 lr 3.90e-05
+step 650/2250 loss 1.6572 ce 1.0931 brier 0.5642 lr 3.78e-05
+step 700/2250 loss 1.5228 ce 0.9617 brier 0.5611 lr 3.66e-05
+step 750/2250 loss 1.3602 ce 0.8725 brier 0.4877 lr 3.54e-05
+step 800/2250 loss 1.1194 ce 0.7154 brier 0.4040 lr 3.43e-05
+step 850/2250 loss 1.2844 ce 0.8077 brier 0.4767 lr 3.31e-05
+step 900/2250 loss 0.9914 ce 0.6276 brier 0.3639 lr 3.19e-05
+step 950/2250 loss 1.9964 ce 1.4265 brier 0.5699 lr 3.07e-05
+step 1000/2250 loss 2.1248 ce 1.4454 brier 0.6794 lr 2.95e-05
+step 1050/2250 loss 1.1970 ce 0.7716 brier 0.4254 lr 2.83e-05
+step 1100/2250 loss 1.2233 ce 0.7734 brier 0.4499 lr 2.72e-05
+step 1150/2250 loss 0.8636 ce 0.5617 brier 0.3019 lr 2.60e-05
+step 1200/2250 loss 1.0732 ce 0.6896 brier 0.3835 lr 2.48e-05
+step 1250/2250 loss 1.0101 ce 0.6447 brier 0.3654 lr 2.36e-05
+step 1300/2250 loss 0.9124 ce 0.6071 brier 0.3053 lr 2.24e-05
+step 1350/2250 loss 0.8788 ce 0.5601 brier 0.3187 lr 2.13e-05
+step 1400/2250 loss 1.8498 ce 1.4253 brier 0.4244 lr 2.01e-05
+step 1450/2250 loss 1.0995 ce 0.7237 brier 0.3759 lr 1.89e-05
+step 1500/2250 loss 1.4514 ce 0.8900 brier 0.5614 lr 1.77e-05
+step 1550/2250 loss 0.9857 ce 0.6183 brier 0.3674 lr 1.65e-05
+step 1600/2250 loss 1.0735 ce 0.7036 brier 0.3699 lr 1.53e-05
+step 1650/2250 loss 0.9949 ce 0.6421 brier 0.3528 lr 1.42e-05
+step 1700/2250 loss 1.3015 ce 0.8779 brier 0.4237 lr 1.30e-05
+step 1750/2250 loss 0.7932 ce 0.4995 brier 0.2937 lr 1.18e-05
+step 1800/2250 loss 0.8388 ce 0.5190 brier 0.3198 lr 1.06e-05
+step 1850/2250 loss 1.5098 ce 0.9830 brier 0.5269 lr 9.43e-06
+step 1900/2250 loss 1.2729 ce 0.8339 brier 0.4390 lr 8.25e-06
+step 1950/2250 loss 1.2746 ce 0.8873 brier 0.3872 lr 7.07e-06
+step 2000/2250 loss 0.7027 ce 0.4412 brier 0.2615 lr 5.89e-06
+step 2050/2250 loss 1.3625 ce 0.8711 brier 0.4914 lr 4.70e-06
+step 2100/2250 loss 1.1886 ce 0.7546 brier 0.4340 lr 3.52e-06
+step 2150/2250 loss 1.1045 ce 0.7101 brier 0.3944 lr 2.34e-06
+step 2200/2250 loss 1.0613 ce 0.6550 brier 0.4063 lr 1.16e-06
+{
+ "backbone": "encoder",
+ "model": "answerdotai/ModernBERT-base",
+ "args": {
+  "model": "answerdotai/ModernBERT-base",
+  "data": "/cache/data",
+  "out": "/cache/runs/encoder-20260918-063718",
+  "epochs": 2.0,
+  "batch": 16,
+  "lr": 5e-05,
+  "head_lr": 0.001,
+  "warmup": 0.06,
+  "brier_weight": 1.0,
+  "max_state": 512,
+  "max_len": 8192,
+  "limit": 0,
+  "test_limit": 1500,
+  "device": "cuda",
+  "eval_batch": 32,
+  "bench_n": "1,10,100",
+  "seed": 0,
+  "save": false,
+  "tiny": false,
+  "pool": "span",
+  "no_amp": false,
+  "attn": "sdpa",
+  "reference_compile": "auto"
+ },
+ "device": "cuda",
+ "reference_compile": false,
+ "params_total": 150787585,
+ "data": {
+  "train_states": 18000,
+  "train_questions": 42000,
+  "test_states": 1500,
+  "test_questions": 3508,
+  "val_states": 375
+ },
+ "autocast_bf16": true,
+ "metrics_train_subset": {
+  "all": {
+   "n": 472,
+   "acc": 0.75,
+   "brier": 0.3275626362141284,
+   "nll": 0.5939832812627455,
+   "ece": 0.03525294717085565,
+   "mean_conf": 0.7310674217040256
+  },
+  "banking77/choice": {
+   "n": 132,
+   "acc": 0.8333333333333334,
+   "brier": 0.238617060617911,
+   "nll": 0.5241747496194198,
+   "ece": 0.04412691046794257,
+   "mean_conf": 0.823448425215302
+  },
+  "banking77/noul": {
+   "n": 66,
+   "acc": 0.9545454545454546,
+   "brier": 0.053547523370331605,
+   "nll": 0.09358298759713081,
+   "ece": 0.0637142902070826,
+   "mean_conf": 0.9378741356459531,
+   "noul_brier": 0.026773760822434642
+  },
+  "boolq/noul": {
+   "n": 64,
+   "acc": 0.671875,
+   "brier": 0.3850543031070568,
+   "nll": 0.5666811118061869,
+   "ece": 0.0873095989227295,
+   "mean_conf": 0.6527118608355522,
+   "noul_brier": 0.19252715235890686
+  },
+  "kind=choice": {
+   "n": 202,
+   "acc": 0.7673267326732673,
+   "brier": 0.3053269477579155,
+   "nll": 0.5990941571982047,
+   "ece": 0.051098610800091565,
+   "mean_conf": 0.7657550632363499
+  },
+  "kind=noul": {
+   "n": 200,
+   "acc": 0.825,
+   "brier": 0.2294483594769777,
+   "nll": 0.35294126024637457,
+   "ece": 0.06423045098781585,
+   "mean_conf": 0.7976014596223832,
+   "noul_brier": 0.11472417910565877
+  },
+  "kind=score": {
+   "n": 70,
+   "acc": 0.4857142857142857,
+   "brier": 0.6720549850082022,
+   "nll": 1.2679262421814799,
+   "ece": 0.11987548811095101,
+   "mean_conf": 0.440871547801154,
+   "score_mae": 0.7356323630881629
+  },
+  "source=banking77": {
+   "n": 198,
+   "acc": 0.8737373737373737,
+   "brier": 0.17692721486871787,
+   "nll": 0.3806441622786568,
+   "ece": 0.037995175430268986,
+   "mean_conf": 0.8615903286921858
+  },
+  "source=boolq": {
+   "n": 64,
+   "acc": 0.671875,
+   "brier": 0.3850543031070568,
+   "nll": 0.5666811118061869,
+   "ece": 0.0873095989227295,
+   "mean_conf": 0.6527118608355522,
+   "noul_brier": 0.19252715235890686
+  },
+  "source=sst5": {
+   "n": 210,
+   "acc": 0.6571428571428571,
+   "brier": 0.45206904928671837,
+   "nll": 0.8034522546154563,
+   "ece": 0.05948236229873838,
+   "mean_conf": 0.6318827565227236
+  },
+  "sst5/choice": {
+   "n": 70,
+   "acc": 0.6428571428571429,
+   "brier": 0.43112273493620973,
+   "nll": 0.7403707543467705,
+   "ece": 0.1433411423649107,
+   "mean_conf": 0.6569618663617542
+  },
+  "sst5/noul": {
+   "n": 70,
+   "acc": 0.8428571428571429,
+   "brier": 0.2530294279157431,
+   "nll": 0.40205976731811893,
+   "ece": 0.09765923619270322,
+   "mean_conf": 0.7978148554052625,
+   "noul_brier": 0.12651471222687186
+  },
+  "sst5/score": {
+   "n": 70,
+   "acc": 0.4857142857142857,
+   "brier": 0.6720549850082022,
+   "nll": 1.2679262421814799,
+   "ece": 0.11987548811095101,
+   "mean_conf": 0.440871547801154,
+   "score_mae": 0.7356323630881629
+  }
+ },
+ "temperature": 1.05,
+ "eval_wall_s": 3.317176342010498,
+ "metrics_T1": {
+  "all": {
+   "n": 3508,
+   "acc": 0.7166476624857469,
+   "brier": 0.35932569344458526,
+   "nll": 0.6552818394817961,
+   "ece": 0.015853329201652618,
+   "mean_conf": 0.7256791431418574
+  },
+  "banking77/choice": {
+   "n": 996,
+   "acc": 0.8333333333333334,
+   "brier": 0.23074595577930485,
+   "nll": 0.560401028118176,
+   "ece": 0.025183
+saved reports/enc-base-18k-2ep-20260918-154024.json
+✓ App completed. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-SvkjF8cVclCAQVo03Uv0MK

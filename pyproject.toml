@@ -1,0 +1,25 @@
+[project]
+name = "typed-decisions"
+version = "0.0.1"
+description = "A lightweight Jev-like typed-decision model (state + {Choice, Score, Noul} questions -> calibrated probabilities in one parallel pass) on two backbones, ModernBERT-large and LLaDA-MoE-7B-A1B, with measured latency / accuracy / calibration / training cost"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+dependencies = [
+  "torch>=2.4",
+  "transformers>=4.56,<5",
+  "datasets",
+  "safetensors",
+  "huggingface_hub",
+  "peft>=0.13",
+  "numpy",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

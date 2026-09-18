@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: typed-decisions
+Version: 0.0.1
+Summary: A lightweight Jev-like typed-decision model (state + {Choice, Score, Noul} questions -> calibrated probabilities in one parallel pass) on two backbones, ModernBERT-large and LLaDA-MoE-7B-A1B, with measured latency / accuracy / calibration / training cost
+License: Apache-2.0
+Requires-Python: >=3.12
+License-File: LICENSE
+Requires-Dist: torch>=2.4
+Requires-Dist: transformers<5,>=4.56
+Requires-Dist: datasets
+Requires-Dist: safetensors
+Requires-Dist: huggingface_hub
+Requires-Dist: peft>=0.13
+Requires-Dist: numpy
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Dynamic: license-file

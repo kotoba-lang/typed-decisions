@@ -1,0 +1,55 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-ODvZos3gjD5iUlzjjdyX38
+✓ Created objects.
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/m
+│   odal_app.py
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/s
+│   rc/typed_decisions
+├── 🔨 Created function data_remote.
+├── 🔨 Created function encoder_remote.
+└── 🔨 Created function dllm_remote.
+The new embeddings will be initialized from a multivariate normal distribution that has old embeddings' mean and covariance. As described in this article: https://nlp.stanford.edu/~johnhew/vocab-expansion.html. To disable this, use `mean_resizing=False`
+/root/typed_decisions/train_encoder.py:123: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  losses.append((step, float(loss), info["ce"], info["brier"]))
+step 0/6750 loss 2.5194 ce 1.7855 brier 0.7340 lr 2.47e-07
+step 50/6750 loss 2.1241 ce 1.5028 brier 0.6213 lr 6.42e-06
+step 100/6750 loss 2.0288 ce 1.4113 brier 0.6175 lr 1.26e-05
+step 150/6750 loss 1.8558 ce 1.2519 brier 0.6038 lr 1.88e-05
+step 200/6750 loss 1.8995 ce 1.2370 brier 0.6625 lr 2.49e-05
+step 250/6750 loss 1.4782 ce 0.9364 brier 0.5418 lr 3.11e-05
+step 300/6750 loss 1.8704 ce 1.2538 brier 0.6166 lr 3.73e-05
+step 350/6750 loss 1.5859 ce 1.0333 brier 0.5527 lr 4.35e-05
+step 400/6750 loss 1.7634 ce 1.1815 brier 0.5819 lr 4.96e-05
+step 450/6750 loss 1.7664 ce 1.1467 brier 0.6197 lr 4.96e-05
+step 500/6750 loss 1.6057 ce 1.0802 brier 0.5256 lr 4.92e-05
+step 550/6750 loss 1.4517 ce 0.9529 brier 0.4988 lr 4.88e-05
+step 600/6750 loss 1.1660 ce 0.7381 brier 0.4278 lr 4.85e-05
+step 650/6750 loss 1.6575 ce 1.0966 brier 0.5608 lr 4.81e-05
+step 700/6750 loss 1.6465 ce 1.0251 brier 0.6214 lr 4.77e-05
+step 750/6750 loss 1.4026 ce 0.8928 brier 0.5097 lr 4.73e-05
+step 800/6750 loss 1.1280 ce 0.7229 brier 0.4051 lr 4.69e-05
+step 850/6750 loss 1.3417 ce 0.8533 brier 0.4883 lr 4.65e-05
+step 900/6750 loss 0.9394 ce 0.5927 brier 0.3467 lr 4.61e-05
+step 950/6750 loss 1.9615 ce 1.3523 brier 0.6092 lr 4.57e-05
+step 1000/6750 loss 1.9734 ce 1.3100 brier 0.6634 lr 4.53e-05
+step 1050/6750 loss 1.3190 ce 0.8571 brier 0.4619 lr 4.49e-05
+step 1100/6750 loss 1.4865 ce 0.9464 brier 0.5401 lr 4.45e-05
+step 1150/6750 loss 1.1094 ce 0.7218 brier 0.3876 lr 4.41e-05
+step 1200/6750 loss 1.2479 ce 0.8004 brier 0.4475 lr 4.37e-05
+step 1250/6750 loss 1.2780 ce 0.8053 brier 0.4727 lr 4.33e-05
+step 1300/6750 loss 1.0583 ce 0.6823 brier 0.3760 lr 4.29e-05
+step 1350/6750 loss 1.1934 ce 0.7440 brier 0.4493 lr 4.25e-05
+step 1400/6750 loss 1.5555 ce 1.1264 brier 0.4291 lr 4.22e-05
+step 1450/6750 loss 1.0090 ce 0.6720 brier 0.3370 lr 4.18e-05
+step 1500/6750 loss 1.6148 ce 1.0470 brier 0.5678 lr 4.14e-05
+step 1550/6750 loss 0.8289 ce 0.5235 brier 0.3053 lr 4.10e-05
+step 1600/6750 loss 1.0669 ce 0.6837 brier 0.3832 lr 4.06e-05
+step 1650/6750 loss 1.0595 ce 0.6782 brier 0.3813 lr 4.02e-05
+step 1700/6750 loss 1.1196 ce 0.7661 brier 0.3535 lr 3.98e-05
+step 1750/6750 loss 1.1296 ce 0.7119 brier 0.4177 lr 3.94e-05
+step 1800/6750 loss 0.9573 ce 0.6064 brier 0.3509 lr 3.90e-05
+step 1850/6750 loss 1.4846 ce 0.9406 brier 0.5440 lr 3.86e-05

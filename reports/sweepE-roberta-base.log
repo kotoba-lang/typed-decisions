@@ -1,0 +1,126 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-y2evuSIEs34PAfbGp1Bi9T
+✓ Created objects.
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/m
+│   odal_app.py
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/s
+│   rc/typed_decisions
+├── 🔨 Created function data_remote.
+├── 🔨 Created function encoder_remote.
+└── 🔨 Created function dllm_remote.
+Some weights of RobertaModel were not initialized from the model checkpoint at FacebookAI/roberta-base and are newly initialized: ['pooler.dense.bias', 'pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+The new embeddings will be initialized from a multivariate normal distribution that has old embeddings' mean and covariance. As described in this article: https://nlp.stanford.edu/~johnhew/vocab-expansion.html. To disable this, use `mean_resizing=False`
+/root/typed_decisions/train_encoder.py:123: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  losses.append((step, float(loss), info["ce"], info["brier"]))
+step 0/94 loss 2.3779 ce 1.6692 brier 0.7087 lr 1.20e-05
+step 50/94 loss 2.5516 ce 1.8591 brier 0.6925 lr 1.45e-05
+Token indices sequence length is longer than the specified maximum sequence length for this model (1036 > 512). Running this sequence through the model will result in indexing errors
+Traceback (most recent call last):
+  File "/pkg/modal/_runtime/container_io_manager.py", line 945, in handle_input_exception
+    yield
+  File "/pkg/modal/_container_entrypoint.py", line 189, in run_input_sync
+    values = io_context.call_function_sync()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pkg/modal/_runtime/container_io_manager.py", line 225, in call_function_sync
+    expected_value_or_values = self.finalized_function.callable(*args, **kwargs)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/modal_app.py", line 59, in encoder_remote
+    rep = train_encoder.main(["--data", DATA, "--out", d, "--device", "cuda"] + argv)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/typed_decisions/train_encoder.py", line 146, in main
+    trec = predict(model, coll, test, a.eval_batch, dev, temperature=1.0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/typed_decisions/encoder.py", line 154, in predict
+    batch = collator([(e.state, e.questions) for e in chunk], device)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/typed_decisions/encoder.py", line 106, in __call__
+    encoded = [self.encode_one(s, qs) for s, qs in items]
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/typed_decisions/encoder.py", line 102, in encode_one
+    raise ValueError(f"sequence {len(ids)} > max_len {self.max_len}: state + {len(questions)} questions")
+ValueError: sequence 530 > max_len 512: state + 1 questions
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/m │
+│ odal_app.py:103 in encoder                                                   │
+│                                                                              │
+│   102 │   │   argv += ["--test-limit", str(test_limit)]                      │
+│ ❱ 103 │   rep = encoder_remote.remote(argv)                                  │
+│   104 │   _save(rep, name)                                                   │
+│                                                                              │
+│ /Users/junkawasaki/.local/pipx/venvs/modal/lib/python3.14/site-packages/moda │
+│ l/_object.py:46 in wrapped                                                   │
+│                                                                              │
+│    45 │   │   await self.hydrate()                                           │
+│ ❱  46 │   │   return await method(self, *args, **kwargs)                     │
+│    47                                                                        │
+│                                                                              │
+│ /Users/junkawasaki/.local/pipx/venvs/modal/lib/python3.14/site-packages/moda │
+│ l/_functions.py:1696 in remote                                               │
+│                                                                              │
+│   1695 │   │                                                                 │
+│ ❱ 1696 │   │   return await self._call_function(args, kwargs)                │
+│   1697                                                                       │
+│                                                                              │
+│ /Users/junkawasaki/.local/pipx/venvs/modal/lib/python3.14/site-packages/moda │
+│ l/_functions.py:1640 in _call_function                                       │
+│                                                                              │
+│   1639 │   │                                                                 │
+│ ❱ 1640 │   │   return await invocation.run_function()                        │
+│   1641                                                                       │
+│                                                                              │
+│ /Users/junkawasaki/.local/pipx/venvs/modal/lib/python3.14/site-packages/moda │
+│ l/_functions.py:493 in run_function                                          │
+│                                                                              │
+│    492 │   │   │   # No more retries left.                                   │
+│ ❱  493 │   │   │   return await _process_result(                             │
+│    494 │   │   │   │   await_response.output.result, await_response.output.d │
+│                                                                              │
+│ /Users/junkawasaki/.local/pipx/venvs/modal/lib/python3.14/site-packages/moda │
+│ l/_utils/function_utils.py:548 in _process_result                            │
+│                                                                              │
+│   547 │   │   │                                                              │
+│ ❱ 548 │   │   │   raise exc_with_hints(exc)                                  │
+│   549                                                                        │
+│                                                                              │
+│     ...Remote call to Modal Function (ta-01M2SJER9FK0W71NX23B875RMR)...      │
+│                                                                              │
+│ /root/modal_app.py:59 in encoder_remote                                      │
+│                                                                              │
+│ ❱ 59 rep = train_encoder.main(["--data", DATA, "--out", d, "--device", "cuda │
+│                                                                              │
+│                                                                              │
+│ /root/typed_decisions/train_encoder.py:146 in main                           │
+│                                                                              │
+│ ❱ 146 trec = predict(model, coll, test, a.eval_batch, dev, temperature=1.0)  │
+│                                                                              │
+│                                                                              │
+│ /usr/local/lib/python3.12/site-packages/torch/utils/_contextlib.py:124 in    │
+│ decorate_context                                                             │
+│                                                                              │
+│ ❱ 124 return func(*args, **kwargs)                                           │
+│                                                                              │
+│                                                                              │
+│ /root/typed_decisions/encoder.py:154 in predict                              │
+│                                                                              │
+│ ❱ 154 batch = collator([(e.state, e.questions) for e in chunk], device)      │
+│                                                                              │
+│                                                                              │
+│ /root/typed_decisions/encoder.py:106 in __call__                             │
+│                                                                              │
+│ ❱ 106 encoded = [self.encode_one(s, qs) for s, qs in items]                  │
+│                                                                              │
+│                                                                              │
+│ /root/typed_decisions/encoder.py:102 in encode_one                           │
+│                                                                              │
+│ ❱ 102 raise ValueError(f"sequence {len(ids)} > max_len {self.max_len}: state │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+ValueError: sequence 530 > max_len 512: state + 1 questions

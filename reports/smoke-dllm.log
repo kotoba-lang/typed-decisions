@@ -1,0 +1,212 @@
+✓ Initialized. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-BU78Xmr3YA5d0NDEKyOHDv
+✓ Created objects.
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/m
+│   odal_app.py
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/s
+│   rc/typed_decisions
+├── 🔨 Created function data_remote.
+├── 🔨 Created function encoder_remote.
+└── 🔨 Created function dllm_remote.
+A new version of the following files was downloaded from https://huggingface.co/inclusionAI/LLaDA-MoE-7B-A1B-Instruct:
+- configuration_lladamoe.py
+. Make sure to double-check they do not contain any added malicious code. To avoid downloading new versions of the code file, you can pin a revision.
+`torch_dtype` is deprecated! Use `dtype` instead!
+A new version of the following files was downloaded from https://huggingface.co/inclusionAI/LLaDA-MoE-7B-A1B-Instruct:
+- modeling_lladamoe.py
+. Make sure to double-check they do not contain any added malicious code. To avoid downloading new versions of the code file, you can pin a revision.
+
+[1ALoading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]
+[1ALoading checkpoint shards:  67%|██████▋   | 2/3 [00:00<00:00, 12.15it/s]
+[1ALoading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 12.75it/s]
+Please note that, unlike autoregressive models, LLaDA MoE employs a bidirectional attention mechanism. In the forward code in modeling_lladamoe.py, we set both attention_mask and causal_mask to None, which affects the default causal attention and causes the input attention_mask parameter to become ineffective. If you pass an attention mask and expect the model to use it for computing other attention mechanisms, it may lead to logits and aux_loss returned by the model being inconsistent with your expectations. 
+/root/typed_decisions/train_dllm.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  acc_loss += float(loss) / a.grad_accum
+step 0/4 loss 1.9815 ce 1.3384 brier 0.6431 lr 1.00e-04
+{
+ "backbone": "dllm",
+ "model": "inclusionAI/LLaDA-MoE-7B-A1B-Instruct",
+ "args": {
+  "model": "inclusionAI/LLaDA-MoE-7B-A1B-Instruct",
+  "data": "/cache/data",
+  "out": "/cache/runs/dllm-20260918-053359",
+  "epochs": 1.0,
+  "batch": 4,
+  "grad_accum": 2,
+  "lr": 0.0001,
+  "warmup": 0.06,
+  "brier_weight": 1.0,
+  "max_state": 512,
+  "lora_r": 16,
+  "lora_alpha": 32,
+  "no_lora": false,
+  "limit": 32,
+  "test_limit": 20,
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "eval_batch": 8,
+  "bench_n": "1,10,100",
+  "eval_steps": "1,2,4",
+  "skip_zero_shot": false,
+  "seed": 0,
+  "tiny": false
+ },
+ "device": "cuda",
+ "alphabet_size": 240,
+ "mask_id": 156895,
+ "params_total": 7356880896,
+ "data": {
+  "train_states": 32,
+  "train_questions": 78,
+  "test_states": 20,
+  "test_questions": 60,
+  "val_states": 50
+ },
+ "metrics_zero_shot_steps1": {
+  "all": {
+   "n": 60,
+   "acc": 0.5166666666666667,
+   "brier": 0.6823051096130002,
+   "nll": 1.9641506179783363,
+   "ece": 0.230941421041886,
+   "mean_conf": 0.6728289785484473
+  },
+  "banking77/choice": {
+   "n": 40,
+   "acc": 0.425,
+   "brier": 0.7792234125128946,
+   "nll": 2.6038341600806882,
+   "ece": 0.30240468718111513,
+   "mean_conf": 0.6609186265617609
+  },
+  "banking77/noul": {
+   "n": 20,
+   "acc": 0.7,
+   "brier": 0.4884685038132113,
+   "nll": 0.6847835337736327,
+   "ece": 0.326023656129837,
+   "mean_conf": 0.69664968252182,
+   "noul_brier": 0.2442342587640797
+  },
+  "kind=choice": {
+   "n": 40,
+   "acc": 0.425,
+   "brier": 0.7792234125128946,
+   "nll": 2.6038341600806882,
+   "ece": 0.30240468718111513,
+   "mean_conf": 0.6609186265617609
+  },
+  "kind=noul": {
+   "n": 20,
+   "acc": 0.7,
+   "brier": 0.4884685038132113,
+   "nll": 0.6847835337736327,
+   "ece": 0.326023656129837,
+   "mean_conf": 0.69664968252182,
+   "noul_brier": 0.2442342587640797
+  },
+  "source=banking77": {
+   "n": 60,
+   "acc": 0.5166666666666667,
+   "brier": 0.6823051096130002,
+   "nll": 1.9641506179783363,
+   "ece": 0.230941421041886,
+   "mean_conf": 0.6728289785484473
+  },
+  "_eval_wall_s": 4.075537919998169
+ },
+ "lora_targets": [
+  "down_proj",
+  "gate_proj",
+  "k_proj",
+  "o_proj",
+  "q_proj",
+  "up_proj",
+  "v_proj"
+ ],
+ "params_trainable": 155189248,
+ "temperature": 1.45,
+ "metrics_trained_steps1_T1": {
+  "all": {
+   "n": 60,
+   "acc": 0.65,
+   "brier": 0.5375685882250507,
+   "nll": 1.499270588537729,
+   "ece": 0.1845673436919848,
+   "mean_conf": 0.7754654869437217
+  },
+  "banking77/choice": {
+   "n": 40,
+   "acc": 0.525,
+   "brier": 0.7023563903575841,
+   "nll": 2.060452097334681,
+   "ece": 0.2513696931302547,
+   "mean_conf": 0.7454879231750965
+  },
+  "banking77/noul": {
+   "n": 20,
+   "acc": 0.9,
+   "brier": 0.2079929839599838,
+   "nll": 0.376907570943825,
+   "ece": 0.15820788741111758,
+   "mean_conf": 0.8354206144809723,
+   "noul_brier": 0.1039964892885511
+  },
+  "kind=choice": {
+   "n": 40,
+   "acc": 0.525,
+   "brier": 0.7023563903575841,
+   "nll": 2.060452097334681,
+   "ece": 0.2513696931302547,
+   "mean_conf": 0.7454879231750965
+  },
+  "kind=noul": {
+   "n": 20,
+   "acc": 0.9,
+   "brier": 0.2079929839599838,
+   "nll": 0.376907570943825,
+   "ece": 0.15820788741111758,
+   "mean_conf": 0.8354206144809723,
+   "noul_brier": 0.1039964892885511
+  },
+  "source=banking77": {
+   "n": 60,
+   "acc": 0.65,
+   "brier": 0.5375685882250507,
+   "nll": 1.499270588537729,
+   "ece": 0.1845673436919848,
+   "mean_conf": 0.7754654869437217
+  },
+  "_eval_wall_s": 1.8344266414642334
+ },
+ "metrics_trained_steps2_T1": {
+  "all": {
+   "n": 60,
+   "acc": 0.65,
+   "brier": 0.5477523290995596,
+   "nll": 1.6088331298122536,
+   "ece": 0.15231556892395023,
+   "mean_conf": 0.7862498809893926
+  },
+  "banking77/choice": {
+   "n": 40,
+   "acc": 0.525,
+   "brier": 0.713008741141161,
+   "nll": 2.2201278427109536,
+   "ece": 0.2562729984521866,
+   "mean_conf": 0.7646309927105903
+  },
+  "banking77/noul": {
+   "n": 20,
+   "acc": 0.9,
+   "brier": 0.21723950501635705,
+   "nll": 0.3862437040148535,
+   "ece": 0.16414084434509277,
+   "mean_conf": 0.829487
+saved reports/smoke-dllm-20260918-143827.json
+Stopping app - local entrypoint completed.
+✓ App completed. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-BU78Xmr3YA5d0NDEKyOHDv

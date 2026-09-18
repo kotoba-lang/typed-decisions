@@ -1,0 +1,28 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/junkawasakicom/main/ap-5zRV1QoZ4nZQXvq5DzEwNV
+✓ Created objects.
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/m
+│   odal_app.py
+├── 🔨 Created mount 
+│   /Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/typed-decisions/s
+│   rc/typed_decisions
+├── 🔨 Created function data_remote.
+├── 🔨 Created function encoder_remote.
+└── 🔨 Created function dllm_remote.
+/usr/local/lib/python3.12/site-packages/transformers/convert_slow_tokenizer.py:566: UserWarning: The sentencepiece tokenizer that you are converting to a fast tokenizer uses the byte fallback option which is not implemented in the fast tokenizers. In practice this means that the fast version of the tokenizer can produce unknown tokens whereas the sentencepiece version would have converted these unknown tokens into a sequence of byte tokens matching the original piece of text.
+  warnings.warn(
+/usr/local/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+/root/typed_decisions/train_encoder.py:123: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  losses.append((step, float(loss), info["ce"], info["brier"]))
+step 0/375 loss 2.6925 ce 1.9451 brier 0.7474 lr 1.82e-06
+step 50/375 loss 1.7991 ce 1.2046 brier 0.5945 lr 1.84e-05
+step 100/375 loss 1.0430 ce 0.6459 brier 0.3971 lr 1.55e-05
+step 150/375 loss 1.2394 ce 0.8556 brier 0.3838 lr 1.27e-05
+step 200/375 loss 0.8368 ce 0.5476 brier 0.2893 lr 9.86e-06
+step 250/375 loss 0.3296 ce 0.2273 brier 0.1022 lr 7.03e-06
+step 300/375 loss 1.4894 ce 0.9632 brier 0.5262 lr 4.19e-06
+step 350/375 loss 0.6154 ce 0.4039 brier 0.2115 lr 1.36e-06

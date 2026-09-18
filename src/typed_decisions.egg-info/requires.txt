@@ -1,0 +1,10 @@
+torch>=2.4
+transformers<5,>=4.56
+datasets
+safetensors
+huggingface_hub
+peft>=0.13
+numpy
+
+[test]
+pytest
