@@ -130,8 +130,11 @@ the dLLM code path, answer token at a `[MASK]`) is at the prior too (0.392).
 
 So the "ModernBERT-large is the obvious first pick" premise did not survive measurement:
 on this pipeline it is the slowest learner of the five encoders tried, and the 149M base is both
-faster and better per training dollar. Whether ModernBERT-large catches up with more epochs is
-measured in `enc-base-18k-6ep` for base (below) and not yet for large.
+faster and better per training dollar. More epochs on base (`enc-base-18k-6ep`, 6 ep, $0.43):
+0.746 all / banking77 0.894, but boolq stays at 0.631 and sst5 level at 0.429 while the
+train-subset accuracy is 0.949 and ECE rises to 0.12 — it memorises the two short-text sources
+and does not read the boolq passages. DeBERTa-v3-large at 1 epoch (0.855, boolq 0.881) is the
+better use of the same $0.26–0.43. ModernBERT-large with more epochs is not measured.
 
 ### Reading against Jev's public numbers
 
@@ -157,5 +160,6 @@ which is consistent with it being a price, not a cost.
 - LLaDA was LoRA r16, one epoch on a third of the data; the encoders were full fine-tunes on all
   of it. The equal-data control above is the fair row; the head-to-head is the "what you'd
   actually run" row.
-- Local Apple M1 Max (MPS) latency for ModernBERT-base: see `runs/mps-latency` row below when
-  present; the H100 numbers are the ones in the tables.
+- Local Apple M1 Max (MPS) latency for ModernBERT-base was attempted twice and both runs were
+  killed by session restarts before the bench row was written; not measured. The H100 numbers are
+  the ones in the tables.
