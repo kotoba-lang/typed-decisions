@@ -67,6 +67,56 @@ train-subset and test metrics per kind and per source, temperature, latency rows
 the local copies of the runs cited below are in `reports/`. USD = H100 wall seconds ×
 $0.001097 (modal.com/pricing, read 2026-09-18) — nothing else is in that number.
 
+## 要約（日本語）
+
+**何を作ったか。** Jev（typesafe.ai）の形 —— 1 つの program state に N 個の型付き question
+（`Choice` 最大 255 択 / `Score` 2〜10 順序段階 / `Noul` yes-no）を載せ、**1 forward** で
+question ごとの較正済み確率分布を返す model —— を、同じ loss（CE + Brier）・同じ読み出し・
+同じ latency bench で 2 系統の backbone に載せて実測した。encoder（ModernBERT-base/large、
+対照に DeBERTa-v3、RoBERTa）は full fine-tune、dLLM（LLaDA-MoE-7B-A1B）は LoRA r16 で
+question ごとに `[MASK]` 1 slot を置く。label は公開 dataset の gold のみ（banking77 / sst5 /
+boolq、train 18,000 state / 42,000 question）。生成しないので structured-output error は
+どちらも構造的に 0。
+
+**結果（H100、Modal、test 1,500 state / 3,508 question）。**
+
+| | ModernBERT-base 149M · 2 ep | DeBERTa-v3-large 435M · 1 ep | LLaDA-MoE-7B-A1B LoRA · 1 ep · 6k |
+|---|---|---|---|
+| 精度（全 question） | 0.717 | **0.855** | 0.835 |
+| Brier / ECE（T fit 後） | 0.359 / 0.013 | **0.204 / 0.014** | 0.231 / 0.028 |
+| e2e latency、1 state × 10 q、p50 | 68 ms | **42 ms** | 676 ms |
+| forward のみ、10 q / 100 q | **19 / 34 ms** | 39 / —（512 ctx に入らない） | 846 / 841 ms |
+| throughput、batch 8 | 435 q/s | 460 q/s | 28 q/s |
+| 訓練費（H100 $0.001097/s） | **$0.16** | $0.26 | $2.29 |
+| 訓練 question 1k あたり | $0.002 | $0.006 | $0.163 |
+
+等データ対照（6k state × 1 ep）: 0.577 / 0.819 / 0.835。LLaDA の diffusion steps=2 は +0.3 pt で
+latency 2 倍（1,341 ms）—— 1 pass が動作点で、これは Jev 自身の主張と同じ。LLaDA の zero-shot は
+0.645（boolq だけ 0.829）。
+
+**前提を覆した測定。** 「ModernBERT-large が本命」は成り立たなかった。新設 `[OPT]` marker token の
+hidden state を採点する head（最初の設計）は、lr 1e-5〜1e-4 / head lr / Brier 重み 0・1・3 /
+autocast 有無 / sdpa・eager / `reference_compile` 有無 / 1〜2 epoch の全掃引で label prior から
+動かない（banking77 intent ≈ 0.12、boolq ≈ 0.62 = 多数派）。loop 自体は正しい（16 state を 50 step で
+loss 0.000 に過学習、train-subset acc 1.0）。効いたのは読み出しの変更 —— **option の text token の
+平均**（と question text の平均）を読む `--pool span`（現在の既定）。この head で ModernBERT-base は
+即座に学び（3k/1ep で 0.539）、DeBERTa-v3-large は 0.787、RoBERTa-large は 0.710 —— ModernBERT-large
+だけが 0.39 のまま。ModernBERT-base を 6 epoch 回すと 0.746 だが、短文 2 source を暗記して boolq は
+0.63 で平ら、ECE は 0.12 に悪化（train-subset 0.949）。
+
+**結論。** 製品経路は encoder。ただし **DeBERTa-v3-large**（最良: 0.855 / 42 ms / $0.26）であって
+ModernBERT-large ではない。ModernBERT-base は最安・8k context の選択肢（0.717 / 68 ms / $0.16）。
+dLLM は精度で並ぶが latency 16 倍・訓練費 14 倍。Jev の 70〜500 ms band には encoder なら桁で
+余裕があり（e2e は Python の tokenise が支配、model は 19〜39 ms）、7B dLLM は 1 step でも band の
+外。Jev の $0.000081/task は ModernBERT-base の 100 決定 forward（34 ms = $0.00004/pass、
+1 決定 $0.0000004）の約 200 倍 —— 価格であって原価ではない。ModernBERT-like 1〜2B を pretrain する
+案は、この結果の前では根拠が無い。
+
+**測っていないもの。** OOD question（同じ state に未見の instructions / option 列 —— model が
+question を読んでいるか slot を暗記したかを分ける検査）、frontier teacher の蒸留（Jev の
+67.8% はこの target）、複数 seed、ModernBERT-large の多 epoch、Apple M1 Max（MPS）の latency
+（2 回とも session 再起動で死んだ）。
+
 ## Measured (H100 80GB on Modal, 2026-09-18; `reports/*.json`)
 
 Test = 1,500 states (500 per source; `--test-limit 1500`), 3,508 questions. "e2e" latency is
