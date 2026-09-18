@@ -27,3 +27,13 @@ step 250/1125 loss 0.7237 ce 0.4449 brier 0.2787 lr 1.65e-05
 step 300/1125 loss 1.1730 ce 0.7401 brier 0.4329 lr 1.56e-05
 step 350/1125 loss 0.7591 ce 0.4705 brier 0.2886 lr 1.46e-05
 step 400/1125 loss 1.7289 ce 1.2938 brier 0.4352 lr 1.37e-05
+step 450/1125 loss 0.9160 ce 0.6029 brier 0.3130 lr 1.27e-05
+step 500/1125 loss 0.6298 ce 0.3901 brier 0.2397 lr 1.18e-05
+step 550/1125 loss 0.6599 ce 0.4179 brier 0.2420 lr 1.09e-05
+step 600/1125 loss 1.0365 ce 0.6566 brier 0.3800 lr 9.91e-06
+step 650/1125 loss 0.8124 ce 0.5197 brier 0.2927 lr 8.96e-06
+step 700/1125 loss 0.4768 ce 0.2968 brier 0.1800 lr 8.02e-06
+step 750/1125 loss 1.1439 ce 0.7361 brier 0.4078 lr 7.07e-06
+step 800/1125 loss 0.5843 ce 0.3617 brier 0.2226 lr 6.12e-06
+step 850/1125 loss 0.8985 ce 0.5964 brier 0.3021 lr 5.18e-06
+step 900/1125 loss 0.2996 ce 0.1998 brier 0.0998 lr 4.23e-06
