@@ -7,3 +7,4 @@ runs/
 *.bin
 data-code/train.jsonl
 data-code/val.jsonl
+data-hermes/
