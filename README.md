@@ -387,3 +387,42 @@ printf '%s' "$KEY" | shasum -a 256 | cut -d' ' -f1 | xargs wrangler kv key put -
 ```
 その後 `curl -X POST … -d @issue.json https://itonami.cloud/api/kotoba-lang/typed-decisions/kaizen` で
 `202 proposed` を確かめる（issue.json は `data/proposals-code.json[0]` を `to_kaizen_issue` に通したもの）。
+
+## 段 0 / 段 1（2026-09-18）: `.cljc` の eval task と Hermes transcript の判断化 —— ADR-2609181900
+
+### 段 0: `:kotoba` task class（`mine_kotoba_tasks.py` → `scripts/model-eval/kotoba-tasks.edn`）
+agent-task-models の eval には 2026-09-18 まで **kotoba / cljc の task が 0** だった（generic な `:code` 11 問）。
+workspace の git 履歴から fix pair を採る: 1 commit が `src/*.cljc|cljk` を 1 本だけ触り、その module の test ns が
+在り、**repo をその commit で展開して module を差し替えた harness が before=FAIL / after=PASS の両方を返す**
+pair だけを task にする（片方しか出ない pair は捨てる —— 壊れた code で通る task は何も測らない）。
+80 repo × 400 commit を歩いて **24 task / 12 repo**（amu, kotoba-sema, kotoba-native, aiueos, kototama, inga, engi,
+kuro, kotobase-peer, kotobase-server, app-kotoba-cloud, slides）。funnel: fix 系 commit の 65% は src を複数触る、
+残りの 3/4 は test ns が無い。
+
+harness（`scripts/agent-task-models-tick.cljk` / `bench.cljk` の `:cljk`）: `git archive <sha>` → module 差し替え →
+runner が `clojure.test` の summary 行を数える（sci では `t/report` の再定義が効かない、実測）→ 最終行 `PASS`。
+`--self-test-cljk N` が両方向を確かめる（4/4 flip、exit 1 で落ちる gate）。
+
+**最初の測定（8 task、最小のもの、実 tick 経由 = ledger 追記）**:
+
+| model | 結果 |
+|---|---|
+| nex-n2.5-mini-uncensored | **8/8 truncated**（out=2048 で content 空、finish_reason length —— reasoning が出力枠を食い切る。fail ではなく「答えていない」） |
+| qwen3.8-flash-next-whitehacker | **error research-service-unavailable**（lane 停止中、538 s timeout） |
+| qwen3.8-27b-uncensored（k16、2.5 tok/s） | 未測定（module 1 本 = 数千 token、1 task 30 分超） |
+
+つまり **今日 fleet に routing されている model は 1 問も答えられていない**。fail ではなく truncated / error で
+数えられていることが今回の harness の価値（8 問中 0 answered を「0 pass」と読まない）。
+
+### 段 1: Hermes transcript → typed decision（`hermes_data.py`）
+`~/.hermes/**/state.db`（282 profile、default だけで 144,686 message / 70,479 tool call、amu-maint だけで 11,698
+call）を read-only で読み、assistant の tool call ごとに 2 判断: Choice「次に呼ぶ tool は」（option = その session が
+使った tool）と Noul「この call はエラー無く終わるか」（terminal は `exit_code`、他は error marker）。state は
+直前の user 発話と直近 2 tool 結果（同 turn の assistant 文は名指しの漏れなので入れない）。**secret scrub**（bearer /
+`sk-` / `TOKEN=` / 長い hex・base64 を `[REDACTED]`、scrub 後も残る行は捨てる）を通し、出力は `data-hermes/`
+（gitignore）。合成 DB での test 緑。**本物の DB への実行は agent の権限で拒否された**（transcript の一括読み出し =
+provenance）。owner が回すなら:
+```
+cd orgs/kotoba-lang/typed-decisions && .venv/bin/python -m typed_decisions.hermes_data --out data-hermes
+```
+出力の `summary.json` に「検証付き triple の数」と profile 別 terminal 成功率が出る —— 成長速度の指標の初値。
