@@ -76,6 +76,7 @@ def to_kaizen_issue(p: dict, org: str, repo: str) -> dict:
     adm = p.get("admit?", {})
     body = (f"typed-decisions proposes wiring {p['definition']} -> {ref.get('fq')} (hash {ref.get('hash')}), "
             f"confidence {p.get('confidence')}; admission noul {adm.get('noul')} vs threshold {adm.get('threshold')} -> {adm.get('decision')}. "
-            f"Distribution: {p['probabilities']}. This is a proposal, not an action: nothing was executed.")
-    return {"kind": "typed-decision", "id": f"td-{p['memo-key'][:16]}", "title": f"wire {p['definition']} -> {ref.get('fq')}",
+            f"Distribution: {p['probabilities']}. This is a proposal, not an action: nothing was executed.")[:8000]
+    # the ingress validates id against ^kaizen:[A-Za-z0-9:._/-]{1,300}$ (cloud_itonami.kaizen/validate) — a wrong id is a 400, nothing queued
+    return {"kind": "typed-decision", "id": f"kaizen:typed-decisions:{p['memo-key'][:16]}:{p.get('window', 'once')}", "title": f"wire {p['definition']} -> {ref.get('fq')}"[:200],
             "body": body, "severity": "low" if adm.get("decision") == "autonomous" else "medium", "org": org, "repo": repo}

@@ -336,3 +336,54 @@ proposal を cloud-itonami の kaizen ingress の形（`{:kind :id :title :body 
 
 symbol-index に `.kotoba` の定義は 95 行しか無く（618k symbol 中）、kotoba-sema の型で候補を刈れる
 corpus が無い。code decision は当面「同 ns 近傍」の distractor で測る。
+
+## 第 4 反復（2026-09-18）: OOD score の gold 作り直し、seed 3 本、承認キューへの実 POST、教師ラベルの追加
+
+### 1. OOD score の gold（`data.py`）
+b77 の「urgency」（3 model + 教師が多数派以下）は **削除**（banking77 に順序の ground truth は無い）。sst5 の
+「intensity」（|level−2|、同じく全員が落ちる）も削除し、**dataset の 5 段階の単調な relabel** 2 問に置換:
+`stars`（1〜5 stars、同方向）と `disappointed`（not at all〜very、**逆方向**）。gold は defensible、
+未見の option 文言 + 未見の instructions は保ったまま。多数派 0.255。
+
+### 2. seed 3 本（DeBERTa-v3-large、augment p=0.7、1 ep、新 OOD set）
+
+| seed | in-domain | OOD | OOD ECE | boolq support | boolq 否定 | sst5 score acc / MAE（段階） |
+|---|---|---|---|---|---|---|
+| 0 | 0.846 | 0.685 | 0.049 | 0.84 | 0.84 | 0.39 / 0.72 |
+| 1 | 0.842 | 0.663 | 0.053 | 0.68 | 0.86 | 0.37 / 0.78 |
+| 2 | 0.852 | 0.687 | 0.028 | 0.79 | 0.85 | 0.42 / 0.67 |
+| **mean（spread）** | **0.847（0.011）** | **0.678（0.025）** | | | | |
+
+in-domain の run 間差は 1 pt、OOD は 2.5 pt —— OOD で 2 pt 以下の差は seed noise の中。boolq support が
+0.68〜0.84 と最も揺れる。新しい score 2 問は多数派 0.255 に対して 0.37〜0.42、MAE 0.7 段階 ——
+「未見の段階列で方向を読む」は部分的に成立（前の規則 gold では測れていなかった）。
+
+### 3. 承認キューへの実 POST（`wire.py to_kaizen_issue`）
+- code decision model（DeBERTa、held-out ns、choice 0.629）から 20 proposal を emit（13/20 正解、
+  `data/proposals-code.json`）。1 件目（正解、confidence 0.74）を kaizen ingress の形にした。
+- ingress の id 形式は `^kaizen:[A-Za-z0-9:._/-]{1,300}$`（`cloud_itonami.kaizen/validate`）—— id を
+  `kaizen:typed-decisions:<memo16>:<window>` に直した。
+- **POST は `503 kaizen intake is not provisioned for this tenant`**（`reports/kaizen-post-receipt-20260918.txt`）。
+  tenant `kotoba-lang/typed-decisions` の ingress key digest が worker の KV
+  （`ITONAMI_DATA` / `kaizen:kotoba-lang/typed-decisions:ingress-key-sha256`）に無い。provisioning は
+  「random key を Keychain に置き、その sha256 を `wrangler kv key put` する」の 2 手で、**Keychain
+  への書き込みがこの session の権限で拒否された**ので未完。手順は下記「owner がやること」。
+- augmentation を code corpus に掛けると **学習しない**（loss 1.5 → 1.7、choice 0.18 = chance、
+  `reports/code-deb-large-1ep-aug05-props-*.json`）。code の option は識別子なので言い換え template と
+  shuffle が state と option の対応を壊す —— augmentation は自然文 corpus 用。
+
+### 4. 教師ラベルの追加（進行中）
+train state 700 件（banking77 350 + boolq 350）に読解系 OOD question（topic / outflow / support /
+否定）を生成し（`data/ood-train.jsonl`、1,400 q）、教師でラベル付けして student に足す。lane が
+**同じ prompt で 180〜600 s hang**（"Say OK" は 1.2 s）—— 並列 8 で timeout した 32 request が lane の
+queue に残って直列化していると読める。probe が 60 s 未満で返るまで待って concurrency 2 で再開する
+script を置いた。結果はこの節に追記する。
+
+### owner がやること（provisioning、1 回）
+```
+KEY=$(openssl rand -hex 32)
+security add-generic-password -a cloud-itonami -s "cloud-itonami KAIZEN_INGRESS_KEY kotoba-lang/typed-decisions" -w "$KEY" -U
+printf '%s' "$KEY" | shasum -a 256 | cut -d' ' -f1 | xargs wrangler kv key put --namespace-id e9857fe8617440e59f9720293dc53afd "kaizen:kotoba-lang/typed-decisions:ingress-key-sha256"
+```
+その後 `curl -X POST … -d @issue.json https://itonami.cloud/api/kotoba-lang/typed-decisions/kaizen` で
+`202 proposed` を確かめる（issue.json は `data/proposals-code.json[0]` を `to_kaizen_issue` に通したもの）。

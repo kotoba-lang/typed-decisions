@@ -125,16 +125,21 @@ def ood_questions(e: Example, label_name: str | None = None) -> list[Question]:
         return [
             Question(f"ood-b77-{split}-{i}-topic", "choice", "Pick the topic that best describes what the customer's message is about.", OOD_B77_TOPIC_NAMES, b77_topic(lab)),
             Question(f"ood-b77-{split}-{i}-outflow", "noul", "Is the customer talking about money leaving their account (a payment, transfer, withdrawal or purchase)?", list(NOUL_OPTIONS), int(b77_topic(lab) == 0)),
-            Question(f"ood-b77-{split}-{i}-urgency", "score", "How much does this message need action from the bank rather than just an explanation?",
-                     ["only needs an explanation", "needs a check", "needs the bank to act"],
-                     0 if any(k in lab.lower() for k in ("why", "what", "how", "supported", "limit", "age", "country", "estimate", "fee", "rate")) else (2 if any(k in lab.lower() for k in ("lost", "stolen", "compromised", "not_working", "declined", "failed", "wrong", "not_recognised", "dispute", "reverted", "pending")) else 1)),
+            # no ordered (score) OOD question for banking77: the dataset has no ordinal ground truth, and the
+            # "urgency" rule used on 2026-09-18 was answered below majority by three models AND the teacher
+            # (0.31) — a label problem, not a model problem. Removed (ADR-2609181715 §4).
         ]
     if e.source == "sst5":
         lev = e.questions[0].gold  # 0..4
         return [
             Question(f"ood-sst5-{split}-{i}-recommend", "noul", "Would the reviewer recommend this to a friend?", list(NOUL_OPTIONS), int(lev >= 3)),
             Question(f"ood-sst5-{split}-{i}-tone", "choice", "Which word best describes the reviewer's tone?", ["dismissive", "lukewarm", "enthusiastic"], 0 if lev <= 1 else (1 if lev == 2 else 2)),
-            Question(f"ood-sst5-{split}-{i}-intensity", "score", "How strongly does the reviewer feel, regardless of direction?", ["mild", "moderate", "strong"], 2 if lev in (0, 4) else (1 if lev in (1, 3) else 0)),
+            # ordered questions whose gold is a MONOTONE relabelling of the dataset's own 5 levels — unseen
+            # option text and instructions, defensible gold. `stars` keeps the direction, `disappointed`
+            # reverses it (reads the scale, not the slot). The former "intensity" (|level-2|) question was
+            # below majority for three models and the teacher alike (0.39) and is removed.
+            Question(f"ood-sst5-{split}-{i}-stars", "score", "How many stars out of five would the reviewer give?", ["1 star", "2 stars", "3 stars", "4 stars", "5 stars"], lev),
+            Question(f"ood-sst5-{split}-{i}-disappointed", "score", "How disappointed does the reviewer sound?", ["not at all", "slightly", "somewhat", "quite", "very"], 4 - lev),
         ]
     if e.source == "boolq":
         q = e.questions[0]

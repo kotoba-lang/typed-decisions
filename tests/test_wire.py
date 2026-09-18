@@ -21,4 +21,4 @@ def test_kaizen_issue_id_is_the_memo_key():
     q = Question("q", "choice", "Which?", ["a.b/x", "a.b/y"], 1)
     p = proposal("a.b/f", "s", q, [0.2, 0.8], ["h1", "h2"], admit_noul=0.9)
     i = to_kaizen_issue(p, "kotoba-lang", "typed-decisions")
-    assert i["id"] == "td-" + p["memo-key"][:16] and i["kind"] == "typed-decision" and "nothing was executed" in i["body"]
+    assert i["id"] == "kaizen:typed-decisions:" + p["memo-key"][:16] + ":once" and i["kind"] == "typed-decision" and "nothing was executed" in i["body"]

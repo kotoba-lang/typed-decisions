@@ -54,6 +54,7 @@ def main(argv=None) -> dict:
     ap.add_argument("--save", action="store_true")
     ap.add_argument("--tiny", action="store_true", help="random tiny ModernBERT config instead of pretrained (tests)")
     ap.add_argument("--pool", default="span", choices=["opt", "q-opt", "span"])
+    ap.add_argument("--emit-proposals", type=int, default=0, help="after training, emit wire.proposal for the first N test choice questions (+ the state's noul as admission when present)")
     ap.add_argument("--augment", type=float, default=0.0, help="probability that a train question is augmented (shuffle / paraphrase / drop / relabel / negate), gold preserved")
     ap.add_argument("--consistency", type=float, default=0.0, help="weight of the symmetric KL between two surface forms of the same question (needs a second forward)")
     ap.add_argument("--no-amp", action="store_true", help="fp32 forward on cuda (isolates bf16 autocast)")
@@ -202,6 +203,27 @@ def main(argv=None) -> dict:
             rep["metrics_ood_Tfit"] = {"error": str(e)}
     else:
         rep["metrics_ood_Tfit"] = {"error": "ood-test.jsonl absent"}
+
+    if a.emit_proposals:
+        from .wire import proposal
+        import hashlib
+        props = []
+        by_qid = {r["qid"]: r for r in trec}
+        for e in test:
+            if len(props) >= a.emit_proposals:
+                break
+            ch = [q for q in e.questions if q.kind == "choice"]
+            if not ch:
+                continue
+            q = ch[0]
+            r = by_qid[q.qid]
+            nouls = [by_qid[x.qid]["probs"][1] for x in e.questions if x.kind == "noul"]
+            hashes = [e.meta.get("option_hashes", {}).get(o) or hashlib.sha256(o.encode()).hexdigest()[:10] for o in q.options]
+            pr = proposal(e.meta.get("fq") or e.source, e.state, q, r["probs"], hashes, admit_noul=(nouls[0] if nouls else None))
+            pr["gold"] = q.options[q.gold]
+            pr["correct"] = (pr.get("reference") or {}).get("fq") == q.options[q.gold].split(" — ")[0]
+            props.append(pr)
+        rep["proposals"] = props
 
     # latency / throughput
     def fn(items):

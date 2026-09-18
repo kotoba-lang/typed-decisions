@@ -55,7 +55,7 @@ def parse(text: str, e: Example) -> list[int | None]:
     return out
 
 
-def call(base_url: str, token: str, model: str, prompt: str, timeout: float = 120) -> tuple[str, dict, float]:
+def call(base_url: str, token: str, model: str, prompt: str, timeout: float = 300) -> tuple[str, dict, float]:
     body = json.dumps({"model": model, "messages": [{"role": "user", "content": prompt}], "max_tokens": 64, "temperature": 0}).encode()
     req = urllib.request.Request(f"{base_url}/chat/completions", data=body, headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json",
                                           # kotoba.cloud sits behind Cloudflare, whose browser-integrity check answers 403 (error 1010) to
