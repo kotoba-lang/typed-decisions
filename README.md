@@ -213,3 +213,76 @@ which is consistent with it being a price, not a cost.
 - Local Apple M1 Max (MPS) latency for ModernBERT-base was attempted twice and both runs were
   killed by session restarts before the bench row was written; not measured. The H100 numbers are
   the ones in the tables.
+
+## 第 2 反復（2026-09-18）: OOD question・教師・code decision —— ADR-2609181800
+
+前回の「測っていないもの」のうち 3 つを測った。全部 `reports/ood-*.json` / `reports/code-*.json` /
+`data/teacher-test.jsonl`。
+
+### ① OOD question（`data/ood-test.jsonl`、`data.py ood_questions`）
+
+同じ test state に**未見の instructions と未見の option 列**（banking77: 4 topic + 「金が出ていく
+話か」noul + 「銀行の行動が要るか」3 段 score / sst5: 「友人に薦めるか」noul・tone 3 択・強度 3 段 /
+boolq: **否定形** noul「この主張は passage によれば偽か」+ supported/contradicted）。gold は同じ
+dataset label からの決定論規則。
+
+| test 1,500 state | in-domain | **OOD** | b77 topic（多数派 0.33） | b77 outflow（0.67） | boolq 否定 noul（0.64） | boolq support（0.64） | sst5 tone（0.41） | sst5 推薦 noul（0.59） | score 2 種 |
+|---|---|---|---|---|---|---|---|---|---|
+| ModernBERT-base 2 ep | 0.728 | **0.485** | 0.400 | 0.418 | **0.397** | 0.579 | 0.540 | 0.690 | 0.378 / 0.474 |
+| DeBERTa-v3-large 1 ep | 0.852 | **0.622** | 0.578 | 0.685 | 0.671 | 0.750 | 0.757 | 0.905 | 0.269 / 0.360 |
+| LLaDA-MoE-7B-A1B LoRA | 0.837 | **0.614** | 0.669 | 0.827 | **0.391** | 0.720 | 0.741 | 0.875 | 0.285 / 0.397 |
+
+読み方: ModernBERT-base は OOD でほぼ多数派以下 —— slot を暗記している。**否定形 noul は
+base も dLLM も多数派を割る（0.40 / 0.39）**: 否定を読まず元の question に答えている。DeBERTa だけ
+0.671。新しい level 列の **score は 3 model とも多数派以下** —— 期待段階の読み出しは option の
+順序を学んでおらず、未見の段階列に転移しない（`score` は OOD では壊れている）。sst5 の「薦めるか」
+だけは全 model で転移する（意味が「positive か」と同じ）。
+
+### ② 教師 `qwen3.8-flash-next-whitehacker`（`teacher.py`）
+
+lane の実測（2026-09-18）: `logprobs` **無し**、`n` は 1 固定、temperature 1.0 で 8 sample が**全部同一**
+→ 教師から取れるのは **hard label だけ**（分布は取れない）。urllib 既定 UA は Cloudflare 1010 で
+403、client 名を名乗る UA で通る。throughput は並列 8 で **0.16 req/s**（p50 47 s / p95 71 s、
+lane が直列化している）、途中 503 あり。答えの形式ゆれ（`A1:` を全行に付ける、`Q1.`、散文）で
+最初の parser は 19% を落とし、行指向 parser で 4% まで下げた。
+
+| 教師の gold 一致（test、hard label） | n | acc | 参考: student DeBERTa-v3-large |
+|---|---|---|---|
+| banking77 intent（77 択） | 590 | **0.776** | 0.922 |
+| banking77 card noul | 293 | 0.877 | 0.968 |
+| sst5 level（5 段） | 119 | 0.555 | 0.585 |
+| sst5 polarity | 115 | 0.783 | 0.800 |
+| sst5 positive noul | 115 | 0.861 | 0.903 |
+| boolq noul | 29（503 で途切れ） | 0.828 | 0.881 |
+
+**教師は zero-shot では in-domain gold で student に負けている**（77 択 intent で 15 pt 下）。
+この教師から hard label を蒸留すると in-domain 精度は**下がる**。教師の価値は gold の無い
+question（= OOD・新規 workflow）のラベル付けにしか無く、そこでの教師の精度は未測定
+（OOD split は規則 gold なので測れる —— 次の反復）。コストは GPU ではなく壁時計: 18k state で
+**約 31 時間**（0.16 req/s）、10⁵ state なら約 1 週間、金額は無料枠 + owner coupon で $0。
+
+### ③ code decision（`code_data.py`、`data-code/`）
+
+symbol-index（v5、618k symbol、`.kotoba-cache/symbol-index.tsv`）から「**definition は次にどの
+definition を参照するか**」を Choice にした。state = `ns/name` + docstring（あれば）+ 既知の参照
+（1 つ hold-out）、option = hold-out 参照 + 同じ namespace の兄弟 def が参照する定義から
+distractor（型情報は index に無いので「同 ns 近傍」で代用）、noul = 「X を参照するか」yes/no を
+**別 example に分離**（同居させると yes-noul の X が Choice の答えを漏らし train loss 0.000 になった —
+実測）。split は **namespace 単位の hash**（test ns は訓練に出ない）。413k def → 参照 2 本以上
+68k Choice + 68k noul pair、test 1,407 ns。
+
+| train 30k example・1 ep | Choice（k≈5.7、chance 0.18） | noul | ECE | train-subset | 費用 |
+|---|---|---|---|---|---|
+| DeBERTa-v3-large | **0.638** | 0.809 | 0.019 | 0.822 | $0.19 |
+| ModernBERT-base | 0.286（発散、loss 1.5→6.1） | 0.580 | 0.178 | 0.475 | $0.14 |
+
+未見 namespace で 0.638 は「名前と近傍だけ」から出ている数字。型で候補を刈れば option 集合が
+縮む（k が下がる）ので上がる余地はそちらにある。ModernBERT-base はここでも発散した（標準 corpus
+の 18k × 1 ep 再走でも 0.434 に落ちた run がある = `replicate-std-base-1ep`。**run 間の不安定**）。
+
+### 判断 → code / tool call（`wire.py`）
+
+答えは pointer: `{:proposal/kind :wire-reference :reference {:fq … :hash …} :probabilities {…}
+:confidence … :admit? {:noul … :threshold … :decision :autonomous|:escalate} :memo-key …}`。
+`memo-key` = sha256(state, question, option hash 列) —— symbol-index の closure hash と同じ流儀で、
+同じ入力の判断は forward を走らせない。実行はしない（agent は propose まで）。

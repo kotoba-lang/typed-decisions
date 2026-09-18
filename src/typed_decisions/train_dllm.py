@@ -186,6 +186,15 @@ def main(argv=None) -> dict:
     for s in [int(x) for x in a.eval_steps.split(",") if x]:
         evaluate(f"trained_steps{s}_T1", s)
     evaluate("trained_steps1_Tfit", 1, temperature=T)
+    ood_path = os.path.join(a.data, "ood-test.jsonl")
+    if os.path.exists(ood_path):
+        ood = read_jsonl(ood_path)
+        if a.test_limit:
+            ood = ood[: a.test_limit]
+        with autocast():
+            rep["metrics_ood_Tfit"] = summarize(predict(dec, ood, a.eval_batch, dev, steps=1, temperature=T))
+    else:
+        rep["metrics_ood_Tfit"] = {"error": "ood-test.jsonl absent"}
 
     def fn_steps(steps):
         def f(items):

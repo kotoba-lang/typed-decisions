@@ -57,7 +57,7 @@ def _banking77(split: str) -> list[Example]:
     out = []
     for i, r in enumerate(ds):
         lab = int(r["label"])
-        out.append(Example(state=r["text"], source="banking77", meta={"i": i, "split": split}, questions=[
+        out.append(Example(state=r["text"], source="banking77", meta={"i": i, "split": split, "label_name": names[lab]}, questions=[
             Question(f"b77-{split}-{i}-intent", "choice", "Which banking intent does the customer message express?", opts, lab),
             Question(f"b77-{split}-{i}-area", "choice", "Which product area is the message about?", AREAS, banking_area(names[lab])),
             Question(f"b77-{split}-{i}-card", "noul", "The customer is asking about a card (physical or virtual).", list(NOUL_OPTIONS), int("card" in names[lab].lower())),
@@ -96,6 +96,55 @@ def _boolq(split: str) -> list[Example]:
     return out
 
 
+# ---- OOD questions: never seen in training (new instructions AND new option sets on the same test
+# states). Gold is derived from the same dataset labels by a deterministic rule, so the split tests
+# whether the model reads the question, not whether it memorised a slot.
+OOD_B77_TOPICS = [  # which of these does the intent belong to? (a different partition than AREAS)
+    ("money going out of the account", ("transfer", "payment", "withdraw", "cash", "direct_debit", "purchase")),
+    ("money coming into the account", ("top_up", "topping_up", "receiving", "refund", "reverted", "deposit")),
+    ("the card as a physical or virtual object", ("card_", "_card", "virtual_card", "contactless", "pin")),
+    ("account setup, limits and identity", ("account", "identity", "verify", "age", "country", "edit_personal", "why_verify")),
+]
+OOD_B77_TOPIC_NAMES = [t for t, _ in OOD_B77_TOPICS] + ["none of these"]
+
+
+def b77_topic(label_name: str) -> int:
+    n = label_name.lower()
+    for i, (_, kws) in enumerate(OOD_B77_TOPICS):
+        if any(k in n for k in kws):
+            return i
+    return len(OOD_B77_TOPICS)
+
+
+def ood_questions(e: Example, label_name: str | None = None) -> list[Question]:
+    """OOD questions for one test example; `label_name` is the banking77 intent name when source is banking77."""
+    i = e.meta.get("i")
+    split = e.meta.get("split")
+    if e.source == "banking77":
+        lab = label_name
+        return [
+            Question(f"ood-b77-{split}-{i}-topic", "choice", "Pick the topic that best describes what the customer's message is about.", OOD_B77_TOPIC_NAMES, b77_topic(lab)),
+            Question(f"ood-b77-{split}-{i}-outflow", "noul", "Is the customer talking about money leaving their account (a payment, transfer, withdrawal or purchase)?", list(NOUL_OPTIONS), int(b77_topic(lab) == 0)),
+            Question(f"ood-b77-{split}-{i}-urgency", "score", "How much does this message need action from the bank rather than just an explanation?",
+                     ["only needs an explanation", "needs a check", "needs the bank to act"],
+                     0 if any(k in lab.lower() for k in ("why", "what", "how", "supported", "limit", "age", "country", "estimate", "fee", "rate")) else (2 if any(k in lab.lower() for k in ("lost", "stolen", "compromised", "not_working", "declined", "failed", "wrong", "not_recognised", "dispute", "reverted", "pending")) else 1)),
+        ]
+    if e.source == "sst5":
+        lev = e.questions[0].gold  # 0..4
+        return [
+            Question(f"ood-sst5-{split}-{i}-recommend", "noul", "Would the reviewer recommend this to a friend?", list(NOUL_OPTIONS), int(lev >= 3)),
+            Question(f"ood-sst5-{split}-{i}-tone", "choice", "Which word best describes the reviewer's tone?", ["dismissive", "lukewarm", "enthusiastic"], 0 if lev <= 1 else (1 if lev == 2 else 2)),
+            Question(f"ood-sst5-{split}-{i}-intensity", "score", "How strongly does the reviewer feel, regardless of direction?", ["mild", "moderate", "strong"], 2 if lev in (0, 4) else (1 if lev in (1, 3) else 0)),
+        ]
+    if e.source == "boolq":
+        q = e.questions[0]
+        return [
+            Question(f"ood-boolq-{split}-{i}-negated", "noul", "Consider the claim: " + q.instructions.rstrip("?") + ". Is this claim FALSE according to the passage?", list(NOUL_OPTIONS), 1 - q.gold),
+            Question(f"ood-boolq-{split}-{i}-support", "choice", "According to the passage, the statement '" + q.instructions.rstrip("?") + "' is:", ["supported", "contradicted"], 0 if q.gold == 1 else 1),
+        ]
+    return []
+
+
 SOURCES = {
     "banking77": ("train", "test"),
     "sst5": ("train", "test"),
@@ -125,6 +174,10 @@ def build(out_dir: str, n_train: int, n_val: int, n_test: int, seed: int = 0) ->
     write_jsonl(os.path.join(out_dir, "train.jsonl"), train)
     write_jsonl(os.path.join(out_dir, "val.jsonl"), val)
     write_jsonl(os.path.join(out_dir, "test.jsonl"), test)
+    ood = [Example(state=e.state, source=e.source, meta=dict(e.meta, ood=True), questions=ood_questions(e, e.meta.get("label_name"))) for e in test]
+    ood = [e for e in ood if e.questions]
+    write_jsonl(os.path.join(out_dir, "ood-test.jsonl"), ood)
+    counts["ood_test"] = {"states": len(ood), "questions": sum(len(e.questions) for e in ood)}
     counts["questions"] = {k: sum(len(e.questions) for e in v) for k, v in (("train", train), ("val", val), ("test", test))}
     return counts
 

@@ -157,6 +157,21 @@ def main(argv=None) -> dict:
         r["probs"] = (z / z.sum()).tolist()
     rep["metrics_Tfit"] = summarize(trec)
 
+    # OOD questions (never-seen instructions and option sets on the same test states): reads the question or memorised the slot?
+    ood_path = os.path.join(a.data, "ood-test.jsonl")
+    if os.path.exists(ood_path):
+        ood = read_jsonl(ood_path)
+        if a.test_limit:
+            ood = ood[: a.test_limit]
+        try:
+            with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=use_amp):
+                orec = predict(model, coll, ood, a.eval_batch, dev, temperature=T)
+            rep["metrics_ood_Tfit"] = summarize(orec)
+        except ValueError as e:
+            rep["metrics_ood_Tfit"] = {"error": str(e)}
+    else:
+        rep["metrics_ood_Tfit"] = {"error": "ood-test.jsonl absent"}
+
     # latency / throughput
     def fn(items):
         with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=use_amp):

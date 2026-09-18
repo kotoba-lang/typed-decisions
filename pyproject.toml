@@ -12,6 +12,9 @@ dependencies = [
   "huggingface_hub",
   "peft>=0.13",
   "numpy",
+  "sentencepiece",
+  "protobuf",
+  "tiktoken",
 ]
 
 [project.optional-dependencies]

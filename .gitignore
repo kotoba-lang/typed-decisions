@@ -5,3 +5,5 @@ data/
 runs/
 *.safetensors
 *.bin
+data-code/train.jsonl
+data-code/val.jsonl
