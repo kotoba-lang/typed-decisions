@@ -1,0 +1,2109 @@
+{
+ "model": "typesafe/jev-1.13",
+ "tasks": [
+  {
+   "id": "kotoba-amu-24516340",
+   "repo": "amu",
+   "message": "extract-native answered \"internal compiler error\" for a caller naming the wrong file (#906)",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 0,
+    "insert": 1,
+    "delete": 0,
+    "ins_tokens": 114,
+    "del_tokens": 0
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-kotoba-native-13bfbebd",
+   "repo": "kotoba-native",
+   "message": "fix(affine): the shape it admitted could not be written, and the shape that can was refused",
+   "shape": {
+    "replace1": 4,
+    "replace_n": 9,
+    "insert": 7,
+    "delete": 1,
+    "ins_tokens": 207,
+    "del_tokens": 41
+   },
+   "n_holes": 4,
+   "holes": [
+    {
+     "pos": 383,
+     "old": "name",
+     "gold": "names",
+     "kind": "symbol",
+     "n_options": 97,
+     "reachable": false,
+     "chance": 0.010309278350515464
+    },
+    {
+     "pos": 426,
+     "old": "second",
+     "gold": "first",
+     "kind": "symbol",
+     "n_options": 97,
+     "reachable": true,
+     "chance": 0.010309278350515464,
+     "top1": "linear?",
+     "correct": false,
+     "gold_rank": 2,
+     "confidence": 0.28,
+     "p_gold": 0.25,
+     "order": [
+      "linear?",
+      "first",
+      "aff/linear-let-thread?",
+      "b",
+      "map",
+      "linear-let-chain?",
+      "val",
+      "key",
+      "sym-uses",
+      "consuming-call?"
+     ],
+     "cost": 0.000230202
+    },
+    {
+     "pos": 465,
+     "old": "init",
+     "gold": "n",
+     "kind": "symbol",
+     "n_options": 97,
+     "reachable": true,
+     "chance": 0.010309278350515464,
+     "top1": "i",
+     "correct": false,
+     "gold_rank": 21,
+     "confidence": 0.16,
+     "p_gold": 0.01,
+     "order": [
+      "i",
+      "v",
+      "b",
+      "aff/linear-let-thread?",
+      "linear-let-chain?",
+      "target",
+      "linear?",
+      "form",
+      "inits",
+      "first"
+     ],
+     "cost": 0.000230202
+    },
+    {
+     "pos": 492,
+     "old": "name",
+     "gold": "live",
+     "kind": "symbol",
+     "n_options": 97,
+     "reachable": false,
+     "chance": 0.010309278350515464
+    }
+   ],
+   "e2e": {
+    "verdict": "FAIL",
+    "runs": 8,
+    "greedy_pass": false,
+    "partial": true,
+    "unreachable_left_as_is": 2
+   },
+   "runs": [
+    {
+     "run": 0,
+     "fills": {
+      "426": "linear?",
+      "465": "i"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 1,
+     "fills": {
+      "426": "linear?",
+      "465": "v"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 2,
+     "fills": {
+      "426": "linear?",
+      "465": "b"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 3,
+     "fills": {
+      "426": "linear?",
+      "465": "aff/linear-let-thread?"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 4,
+     "fills": {
+      "426": "linear?",
+      "465": "linear-let-chain?"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 5,
+     "fills": {
+      "426": "linear?",
+      "465": "target"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 6,
+     "fills": {
+      "426": "linear?",
+      "465": "linear?"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 7,
+     "fills": {
+      "426": "linear?",
+      "465": "form"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    }
+   ]
+  },
+  {
+   "id": "kotoba-app-kotoba-cloud-f6005de2",
+   "repo": "app-kotoba-cloud",
+   "message": "advisory panel: wire it to OpenRouter, and fix the three things running it found",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 5,
+    "insert": 3,
+    "delete": 0,
+    "ins_tokens": 29,
+    "del_tokens": 15
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-kotobase-peer-9b251ecc",
+   "repo": "kotobase-peer",
+   "message": "fix: scope and validate retention roots",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 0,
+    "insert": 3,
+    "delete": 0,
+    "ins_tokens": 106,
+    "del_tokens": 0
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-kotobase-peer-2ee8b10c",
+   "repo": "kotobase-peer",
+   "message": "feat(policy): owner-based disclosure — viewer==owner sees own protected rows (ADR-2607174500 Phase 3c)",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 2,
+    "insert": 8,
+    "delete": 0,
+    "ins_tokens": 76,
+    "del_tokens": 2
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-kotoba-sema-1c16d4cf",
+   "repo": "kotoba-sema",
+   "message": "the reader could not read a hex literal, and 79 .kotoba files use them",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 1,
+    "insert": 2,
+    "delete": 0,
+    "ins_tokens": 185,
+    "del_tokens": 1
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-kotoba-sema-4471b336",
+   "repo": "kotoba-sema",
+   "message": "affine: a handle fetched out of an aggregate is not dead",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 0,
+    "insert": 3,
+    "delete": 0,
+    "ins_tokens": 143,
+    "del_tokens": 0
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-kotoba-sema-ae30fa83",
+   "repo": "kotoba-sema",
+   "message": "fix(affine): the bang form consumes, and this copy was the version before the correction",
+   "shape": {
+    "replace1": 4,
+    "replace_n": 10,
+    "insert": 8,
+    "delete": 1,
+    "ins_tokens": 216,
+    "del_tokens": 42
+   },
+   "n_holes": 4,
+   "holes": [
+    {
+     "pos": 383,
+     "old": "name",
+     "gold": "names",
+     "kind": "symbol",
+     "n_options": 99,
+     "reachable": false,
+     "chance": 0.010101010101010102
+    },
+    {
+     "pos": 426,
+     "old": "second",
+     "gold": "first",
+     "kind": "symbol",
+     "n_options": 99,
+     "reachable": true,
+     "chance": 0.010101010101010102,
+     "top1": "linear?",
+     "correct": false,
+     "gold_rank": 2,
+     "confidence": 0.19,
+     "p_gold": 0.15000000000000002,
+     "order": [
+      "linear?",
+      "first",
+      "vector-assoc!",
+      "val",
+      "map",
+      "aff/linear-let-thread?",
+      "linear-let-chain?",
+      "b",
+      "nth",
+      "init"
+     ],
+     "cost": 0.000243054
+    },
+    {
+     "pos": 465,
+     "old": "init",
+     "gold": "n",
+     "kind": "symbol",
+     "n_options": 99,
+     "reachable": true,
+     "chance": 0.010101010101010102,
+     "top1": "vector-assoc!",
+     "correct": false,
+     "gold_rank": 95,
+     "confidence": 0.3,
+     "p_gold": 0,
+     "order": [
+      "vector-assoc!",
+      "i",
+      "linear-let-chain?",
+      "b",
+      "aff/linear-let-thread?",
+      "v",
+      "target",
+      "form",
+      "linear?",
+      "first"
+     ],
+     "cost": 0.000243054
+    },
+    {
+     "pos": 492,
+     "old": "name",
+     "gold": "live",
+     "kind": "symbol",
+     "n_options": 99,
+     "reachable": false,
+     "chance": 0.010101010101010102
+    }
+   ],
+   "e2e": {
+    "verdict": "FAIL",
+    "runs": 8,
+    "greedy_pass": false,
+    "partial": true,
+    "unreachable_left_as_is": 2
+   },
+   "runs": [
+    {
+     "run": 0,
+     "fills": {
+      "426": "linear?",
+      "465": "vector-assoc!"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 1,
+     "fills": {
+      "426": "first",
+      "465": "vector-assoc!"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 2,
+     "fills": {
+      "426": "vector-assoc!",
+      "465": "vector-assoc!"
+     },
+     "verdict": "FAIL",
+     "tail": "               ^\n\nError: Unable to resolve symbol: vector-assoc!\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 3,
+     "fills": {
+      "426": "val",
+      "465": "vector-assoc!"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 4,
+     "fills": {
+      "426": "map",
+      "465": "vector-assoc!"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 5,
+     "fills": {
+      "426": "aff/linear-let-thread?",
+      "465": "vector-assoc!"
+     },
+     "verdict": "FAIL",
+     "tail": "      ^\n\nError: Unable to resolve symbol: aff/linear-let-thread?\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 6,
+     "fills": {
+      "426": "linear-let-chain?",
+      "465": "vector-assoc!"
+     },
+     "verdict": "FAIL",
+     "tail": "                        ^\n\nError: Unable to resolve symbol: init\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 7,
+     "fills": {
+      "426": "b",
+      "465": "vector-assoc!"
+     },
+     "verdict": "FAIL",
+     "tail": "                           ^\n\nError: Unable to resolve symbol: b\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    }
+   ]
+  },
+  {
+   "id": "kotoba-aiueos-63d0e5ca",
+   "repo": "aiueos",
+   "message": "a production machine boots knowing who it may talk to",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 0,
+    "insert": 5,
+    "delete": 0,
+    "ins_tokens": 62,
+    "del_tokens": 0
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-aiueos-15d105dd",
+   "repo": "aiueos",
+   "message": "security: add net-url-allowed? for ADR-0010 net-allow enforcement",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 0,
+    "insert": 2,
+    "delete": 0,
+    "ins_tokens": 251,
+    "del_tokens": 0
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-aiueos-d7514e98",
+   "repo": "aiueos",
+   "message": "feat(virtio): port virtio-console service core to aiueos.virtio (ADR-0011 follow-up)",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 1,
+    "insert": 1,
+    "delete": 0,
+    "ins_tokens": 605,
+    "del_tokens": 1
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-aiueos-5c2642c1",
+   "repo": "aiueos",
+   "message": "fix(security): kernel-primitive imports can no longer resolve via a peer's export claim",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 0,
+    "insert": 3,
+    "delete": 0,
+    "ins_tokens": 26,
+    "del_tokens": 0
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-kototama-beae237c",
+   "repo": "kototama",
+   "message": "fix(T8.4): align browser host-impl Node status with actor-host honesty",
+   "shape": {
+    "replace1": 37,
+    "replace_n": 1,
+    "insert": 0,
+    "delete": 0,
+    "ins_tokens": 38,
+    "del_tokens": 38
+   },
+   "n_holes": 37,
+   "holes": [
+    {
+     "pos": 218,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.99,
+     "p_gold": 1,
+     "order": [
+      ":no",
+      ":object-put-block",
+      ":errors",
+      ":pg-prepare",
+      ":json-extract-field",
+      ":library",
+      ":worker",
+      ":transport-connect",
+      ":pg-execute-params2",
+      ":or"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 229,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.99,
+     "p_gold": 1,
+     "order": [
+      ":no",
+      ":score",
+      ":http-post-provider",
+      ":credential-provider",
+      ":object-put-block",
+      ":pg-prepare-typed",
+      ":http-post",
+      ":pg-copy-in",
+      ":scram-sha256",
+      ":worker"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 240,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.96,
+     "p_gold": 0.97,
+     "order": [
+      ":no",
+      ":yes",
+      ":pg-open-scram",
+      ":pg-open-scram-cancellable-random",
+      ":title",
+      ":qualified",
+      ":worker",
+      ":transport-write",
+      ":kototama.host/code",
+      ":credential-provider"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 251,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.9,
+     "p_gold": 0.91,
+     "order": [
+      ":no",
+      ":yes",
+      ":transport-write",
+      ":transport-connect",
+      ":gen-keypair",
+      ":pg-pool-stats",
+      ":object-compare-and-set-ref",
+      ":errors",
+      ":pg-open",
+      ":host"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 262,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.92,
+     "p_gold": 0.93,
+     "order": [
+      ":no",
+      ":yes",
+      ":transport-write",
+      ":store",
+      ":llm-infer-paths",
+      ":llm-provider",
+      ":not-yet-built",
+      ":unsupported-import",
+      ":pg-prepare-typed",
+      ":abi/imports"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 273,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.92,
+     "p_gold": 0.93,
+     "order": [
+      ":no",
+      ":yes",
+      ":transport-close",
+      ":required",
+      ":clock-monotonic",
+      ":worker",
+      ":implemented",
+      ":import/id",
+      ":pg-pool-release",
+      ":pg-open-scram-cancellable-random"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 284,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.97,
+     "p_gold": 0.98,
+     "order": [
+      ":no",
+      ":yes",
+      ":tls-server-end-point",
+      ":pg-pool-close",
+      ":cross-origin-isolated",
+      ":store",
+      ":library",
+      ":sab-coop-via-proxy",
+      ":node",
+      ":r2"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 295,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.98,
+     "p_gold": 0.99,
+     "order": [
+      ":no",
+      ":yes",
+      ":required",
+      ":clock-monotonic",
+      ":worker",
+      ":implemented",
+      ":pg-pool-release",
+      ":llm-client",
+      ":json-extract-field",
+      ":pg-open-scram-cancellable-random"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 306,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.99,
+     "p_gold": 1,
+     "order": [
+      ":no",
+      ":unknown-host",
+      ":credential-provider",
+      ":pg-query",
+      ":pg-open-scram-random",
+      ":pg-open-scram-cancellable-random",
+      ":status",
+      ":pg-close-statement",
+      ":abi/imports",
+      ":pg-pool-drain"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 317,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.98,
+     "p_gold": 0.99,
+     "order": [
+      ":no",
+      ":yes",
+      ":unknown-host",
+      ":credential-provider",
+      ":pg-query",
+      ":pg-close-statement",
+      ":pg-open-scram-cancellable-random",
+      ":pg-open-scram-random",
+      ":status",
+      ":abi/imports"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 328,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.91,
+     "p_gold": 0.92,
+     "order": [
+      ":no",
+      ":yes",
+      ":pg-pool-query",
+      ":node",
+      ":pg-cancel-register",
+      ":total",
+      ":errors",
+      ":object-get-stream",
+      ":pg-close-portal",
+      ":transport-read"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 339,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.8,
+     "p_gold": 0.81,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":pg-pool-release",
+      ":host-free-guests",
+      ":pg-simple-query",
+      ":tls-server-end-point",
+      ":errors",
+      ":pg-close-scram",
+      ":pg-prepare-typed"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 350,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.9,
+     "p_gold": 0.91,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":score",
+      ":pg-pool-acquire",
+      ":browser-yes",
+      ":unknown-host",
+      ":store",
+      ":host",
+      ":host-free-guests"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 361,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.92,
+     "p_gold": 0.93,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":pg-copy-out",
+      ":pg-cancel",
+      ":json-encode",
+      ":http-bridge",
+      ":host-free-guests",
+      ":coop-or-inject",
+      ":kototama.host/admission"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 372,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.94,
+     "p_gold": 0.95,
+     "order": [
+      ":no",
+      ":yes",
+      ":node",
+      ":pg-pool-drain",
+      ":pg-execute-params",
+      ":cross-origin-isolated",
+      ":jspi-experimental",
+      ":browser",
+      ":http-post-provider",
+      ":total"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 383,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.89,
+     "p_gold": 0.91,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":pg-pool-close",
+      ":clock-monotonic",
+      ":tls-server-end-point",
+      ":object-compare-and-set-ref",
+      ":transport-close",
+      ":host-surface-rejected",
+      ":pg-simple-query"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 394,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.99,
+     "p_gold": 1,
+     "order": [
+      ":no",
+      ":missing-host-configuration",
+      ":clock-monotonic",
+      ":errors",
+      ":host",
+      ":pg-open-scram-random",
+      ":pg-execute-params2",
+      ":invented",
+      ":http-bridge",
+      ":http-post-headers"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 405,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.95,
+     "p_gold": 0.96,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":browser-no",
+      ":json-encode",
+      ":pg-simple-query",
+      ":http-post-paths",
+      ":http-post-headers",
+      ":ratio",
+      ":pg-prepare"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 416,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.93,
+     "p_gold": 0.9400000000000001,
+     "order": [
+      ":no",
+      ":node",
+      ":pg-simple-query",
+      ":yes",
+      ":pg-cancel",
+      ":llm-client",
+      ":library",
+      ":pg-open-scram",
+      ":scram-sha256",
+      ":kototama.host/code"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 427,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.91,
+     "p_gold": 0.92,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":pg-prepare",
+      ":pg-cancel-register",
+      ":total",
+      ":errors",
+      ":object-get-stream",
+      ":pg-close-portal",
+      ":transport-read"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 438,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.94,
+     "p_gold": 0.95,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":ratio",
+      ":transport-write",
+      ":pg-close-statement",
+      ":pg-query",
+      ":keys",
+      ":clock-monotonic",
+      ":llm-infer"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 449,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.79,
+     "p_gold": 0.8,
+     "order": [
+      ":no",
+      ":yes",
+      ":node",
+      ":pg-close-statement",
+      ":tls-server-end-point",
+      ":pg-pool-close",
+      ":cross-origin-isolated",
+      ":store",
+      ":library",
+      ":sab-coop-via-proxy"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 460,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.89,
+     "p_gold": 0.91,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":pg-query-state",
+      ":pg-copy-out",
+      ":pg-cancel",
+      ":json-encode",
+      ":http-bridge",
+      ":host-free-guests",
+      ":coop-or-inject"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 471,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.93,
+     "p_gold": 0.9400000000000001,
+     "order": [
+      ":no",
+      ":yes",
+      ":pg-prepare-typed",
+      ":node",
+      ":gen-keypair",
+      ":pg-pool-stats",
+      ":object-compare-and-set-ref",
+      ":http-post",
+      ":pg-pool-close",
+      ":pg-open"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 482,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.96,
+     "p_gold": 0.97,
+     "order": [
+      ":no",
+      ":yes",
+      ":node",
+      ":pg-cancel",
+      ":pg-copy-out",
+      ":json-encode",
+      ":http-bridge",
+      ":host-free-guests",
+      ":kototama.host/admission",
+      ":coop-or-inject"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 493,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.97,
+     "p_gold": 0.98,
+     "order": [
+      ":no",
+      ":pg-execute-params",
+      ":node",
+      ":pg-cancel-authority-use",
+      ":llm-infer-paths",
+      ":json-extract-field",
+      ":object-get-stream",
+      ":transport-connect",
+      ":level",
+      ":pg-query"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 504,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.94,
+     "p_gold": 0.95,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":pg-bind-portal",
+      ":transport-connect",
+      ":pg-cancel-register",
+      ":errors",
+      ":sab-coop-via-proxy",
+      ":http-bridge",
+      ":gen-keypair"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 515,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.93,
+     "p_gold": 0.9400000000000001,
+     "order": [
+      ":no",
+      ":yes",
+      ":node",
+      ":pg-fetch-portal",
+      ":host",
+      ":llm-client",
+      ":json-encode",
+      ":pg-open-scram-random",
+      ":available",
+      ":abi/imports"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 526,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.84,
+     "p_gold": 0.85,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":pg-pool-close",
+      ":pg-close-portal",
+      ":pg-prepare",
+      ":keys",
+      ":store",
+      ":llm-infer",
+      ":pg-session-reset"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 537,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.94,
+     "p_gold": 0.95,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":pg-copy-out",
+      ":pg-cancel-register",
+      ":total",
+      ":errors",
+      ":object-get-stream",
+      ":pg-close-portal",
+      ":transport-read"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 548,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.94,
+     "p_gold": 0.95,
+     "order": [
+      ":no",
+      ":yes",
+      ":node",
+      ":pg-copy-in",
+      ":pg-cancel-authority-use",
+      ":llm-infer-paths",
+      ":json-extract-field",
+      ":object-get-stream",
+      ":transport-connect",
+      ":level"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 559,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.95,
+     "p_gold": 0.96,
+     "order": [
+      ":no",
+      ":yes",
+      ":pg-execute-batch",
+      ":node",
+      ":pg-open-scram",
+      ":unknown-host",
+      ":import/id",
+      ":title",
+      ":cbor-encode",
+      ":pg-close-portal"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 581,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.97,
+     "p_gold": 0.98,
+     "order": [
+      ":no",
+      ":yes",
+      ":host-free-guests",
+      ":pg-simple-query",
+      ":tls-server-end-point",
+      ":errors",
+      ":pg-close-scram",
+      ":pg-prepare-typed",
+      ":llm-infer-paths",
+      ":browser-no"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 592,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.92,
+     "p_gold": 0.93,
+     "order": [
+      ":no",
+      ":yes",
+      ":node",
+      ":pg-open-scram-random",
+      ":pg-open-scram",
+      ":qualified",
+      ":verify",
+      ":host-free-guests",
+      ":pg-pool-drain",
+      ":pg-close-statement"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 603,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.91,
+     "p_gold": 0.92,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":pg-open-scram-cancellable-random",
+      ":ratio",
+      ":transport-write",
+      ":pg-close-statement",
+      ":pg-query",
+      ":keys",
+      ":configured"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 614,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.96,
+     "p_gold": 0.97,
+     "order": [
+      ":no",
+      ":yes",
+      ":node",
+      ":host",
+      ":llm-client",
+      ":json-encode",
+      ":pg-open-scram-random",
+      ":available",
+      ":abi/imports",
+      ":title"
+     ],
+     "cost": 0.000402066
+    },
+    {
+     "pos": 625,
+     "old": ":inject",
+     "gold": ":no",
+     "kind": "keyword",
+     "n_options": 130,
+     "reachable": true,
+     "chance": 0.007692307692307693,
+     "top1": ":no",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.93,
+     "p_gold": 0.93,
+     "order": [
+      ":no",
+      ":node",
+      ":yes",
+      ":pg-pool-close",
+      ":pg-close-scram",
+      ":implemented",
+      ":configured",
+      ":unknown-import",
+      ":abi/imports",
+      ":profile"
+     ],
+     "cost": 0.000402066
+    }
+   ],
+   "e2e": {
+    "verdict": "PASS",
+    "runs": 1,
+    "greedy_pass": true,
+    "partial": false,
+    "unreachable_left_as_is": 0
+   },
+   "runs": [
+    {
+     "run": 0,
+     "fills": {
+      "218": ":no",
+      "229": ":no",
+      "240": ":no",
+      "251": ":no",
+      "262": ":no",
+      "273": ":no",
+      "284": ":no",
+      "295": ":no",
+      "306": ":no",
+      "317": ":no",
+      "328": ":no",
+      "339": ":no",
+      "350": ":no",
+      "361": ":no",
+      "372": ":no",
+      "383": ":no",
+      "394": ":no",
+      "405": ":no",
+      "416": ":no",
+      "427": ":no",
+      "438": ":no",
+      "449": ":no",
+      "460": ":no",
+      "471": ":no",
+      "482": ":no",
+      "493": ":no",
+      "504": ":no",
+      "515": ":no",
+      "526": ":no",
+      "537": ":no",
+      "548": ":no",
+      "559": ":no",
+      "581": ":no",
+      "592": ":no",
+      "603": ":no",
+      "614": ":no",
+      "625": ":no"
+     },
+     "verdict": "PASS",
+     "tail": "\nTesting kototama.browser-test\n\nRan 7 tests containing 307 assertions.\n0 failures, 0 errors.\n\n{:tests \"7\", :assertions \"307\", :failures \"0\", :errors \"0\"}\nPASS\n"
+    }
+   ]
+  },
+  {
+   "id": "kotoba-kototama-de177068",
+   "repo": "kototama",
+   "message": "rename: align :now/:log-append! with kotoba-core-contracts' clock-monotonic/log-write (#21)",
+   "shape": {
+    "replace1": 4,
+    "replace_n": 2,
+    "insert": 0,
+    "delete": 0,
+    "ins_tokens": 6,
+    "del_tokens": 6
+   },
+   "n_holes": 4,
+   "holes": [
+    {
+     "pos": 107,
+     "old": ":log-append!",
+     "gold": ":log-write",
+     "kind": "keyword",
+     "n_options": 63,
+     "reachable": true,
+     "chance": 0.015873015873015872,
+     "top1": ":log-write",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.99,
+     "p_gold": 1,
+     "order": [
+      ":log-write",
+      ":error",
+      ":grants/missing",
+      ":else",
+      ":require",
+      ":import/effects",
+      ":grants",
+      ":limit/secret-imports",
+      ":secret",
+      ":import/id"
+     ],
+     "cost": 0.00019215
+    },
+    {
+     "pos": 121,
+     "old": ":now",
+     "gold": ":clock-monotonic",
+     "kind": "keyword",
+     "n_options": 63,
+     "reachable": true,
+     "chance": 0.015873015873015872,
+     "top1": ":clock-monotonic",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.81,
+     "p_gold": 0.81,
+     "order": [
+      ":clock-monotonic",
+      ":log-write",
+      ":log-append!",
+      ":import/name",
+      ":verify",
+      ":kototama.contract/RuntimeLimits",
+      ":abi/version",
+      ":crypto",
+      ":content-addressing",
+      ":network"
+     ],
+     "cost": 0.000192486
+    },
+    {
+     "pos": 191,
+     "old": ":max-log-append-bytes",
+     "gold": ":max-log-write-bytes",
+     "kind": "keyword",
+     "n_options": 63,
+     "reachable": false,
+     "chance": 0.015873015873015872
+    },
+    {
+     "pos": 218,
+     "old": ":max-log-append-bytes",
+     "gold": ":max-log-write-bytes",
+     "kind": "keyword",
+     "n_options": 63,
+     "reachable": false,
+     "chance": 0.015873015873015872
+    }
+   ],
+   "e2e": {
+    "verdict": "FAIL",
+    "runs": 8,
+    "greedy_pass": false,
+    "partial": true,
+    "unreachable_left_as_is": 2
+   },
+   "runs": [
+    {
+     "run": 0,
+     "fills": {
+      "107": ":log-write",
+      "121": ":clock-monotonic"
+     },
+     "verdict": "FAIL",
+     "tail": "000gn/T/tmpqib4vuxg/runner.cljk:89)\nexpected: (:ok? open)\n  actual: false\n\nRan 7 tests containing 23 assertions.\n7 failures, 0 errors.\n\n{:tests \"7\", :assertions \"23\", :failures \"7\", :errors \"0\"}\nFAIL\n"
+    },
+    {
+     "run": 1,
+     "fills": {
+      "107": ":log-write",
+      "121": ":log-write"
+     },
+     "verdict": "FAIL",
+     "tail": "000gn/T/tmpmr1j88ue/runner.cljk:89)\nexpected: (:ok? open)\n  actual: false\n\nRan 7 tests containing 23 assertions.\n9 failures, 0 errors.\n\n{:tests \"7\", :assertions \"23\", :failures \"9\", :errors \"0\"}\nFAIL\n"
+    },
+    {
+     "run": 2,
+     "fills": {
+      "107": ":log-write",
+      "121": ":log-append!"
+     },
+     "verdict": "FAIL",
+     "tail": "000gn/T/tmp5z4j97js/runner.cljk:89)\nexpected: (:ok? open)\n  actual: false\n\nRan 7 tests containing 23 assertions.\n9 failures, 0 errors.\n\n{:tests \"7\", :assertions \"23\", :failures \"9\", :errors \"0\"}\nFAIL\n"
+    },
+    {
+     "run": 3,
+     "fills": {
+      "107": ":log-write",
+      "121": ":import/name"
+     },
+     "verdict": "FAIL",
+     "tail": "000gn/T/tmp_n7pgdlk/runner.cljk:89)\nexpected: (:ok? open)\n  actual: false\n\nRan 7 tests containing 23 assertions.\n9 failures, 0 errors.\n\n{:tests \"7\", :assertions \"23\", :failures \"9\", :errors \"0\"}\nFAIL\n"
+    },
+    {
+     "run": 4,
+     "fills": {
+      "107": ":log-write",
+      "121": ":verify"
+     },
+     "verdict": "FAIL",
+     "tail": "000gn/T/tmpm_9outmh/runner.cljk:89)\nexpected: (:ok? open)\n  actual: false\n\nRan 7 tests containing 23 assertions.\n9 failures, 0 errors.\n\n{:tests \"7\", :assertions \"23\", :failures \"9\", :errors \"0\"}\nFAIL\n"
+    },
+    {
+     "run": 5,
+     "fills": {
+      "107": ":log-write",
+      "121": ":kototama.contract/RuntimeLimits"
+     },
+     "verdict": "FAIL",
+     "tail": "000gn/T/tmpgsfmzvpx/runner.cljk:89)\nexpected: (:ok? open)\n  actual: false\n\nRan 7 tests containing 23 assertions.\n9 failures, 0 errors.\n\n{:tests \"7\", :assertions \"23\", :failures \"9\", :errors \"0\"}\nFAIL\n"
+    },
+    {
+     "run": 6,
+     "fills": {
+      "107": ":log-write",
+      "121": ":abi/version"
+     },
+     "verdict": "FAIL",
+     "tail": "000gn/T/tmpj_rab81t/runner.cljk:89)\nexpected: (:ok? open)\n  actual: false\n\nRan 7 tests containing 23 assertions.\n9 failures, 0 errors.\n\n{:tests \"7\", :assertions \"23\", :failures \"9\", :errors \"0\"}\nFAIL\n"
+    },
+    {
+     "run": 7,
+     "fills": {
+      "107": ":log-write",
+      "121": ":crypto"
+     },
+     "verdict": "FAIL",
+     "tail": "000gn/T/tmp0cshye9n/runner.cljk:89)\nexpected: (:ok? open)\n  actual: false\n\nRan 7 tests containing 23 assertions.\n9 failures, 0 errors.\n\n{:tests \"7\", :assertions \"23\", :failures \"9\", :errors \"0\"}\nFAIL\n"
+    }
+   ]
+  },
+  {
+   "id": "kotoba-inga-d0886a2e",
+   "repo": "inga",
+   "message": "fix(sync): 繋がっていない chain と、証明されていない block を区別する",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 0,
+    "insert": 2,
+    "delete": 0,
+    "ins_tokens": 24,
+    "del_tokens": 0
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-inga-8bc3583e",
+   "repo": "inga",
+   "message": "G2 follow-up: refusal bookkeeping is counted, not listed (ADR-2608055000)",
+   "shape": {
+    "replace1": 1,
+    "replace_n": 2,
+    "insert": 2,
+    "delete": 1,
+    "ins_tokens": 8,
+    "del_tokens": 11
+   },
+   "n_holes": 1,
+   "holes": [
+    {
+     "pos": 483,
+     "old": "update",
+     "gold": "update-in",
+     "kind": "symbol",
+     "n_options": 127,
+     "reachable": true,
+     "chance": 0.007874015748031496,
+     "top1": "update-in",
+     "correct": true,
+     "gold_rank": 1,
+     "confidence": 0.81,
+     "p_gold": 0.8200000000000001,
+     "order": [
+      "update-in",
+      "assoc-in",
+      "assoc",
+      "fnil",
+      "table",
+      "set",
+      "storage-is-a-role-on-the-existing-market-not-a-second-economy",
+      "reduce",
+      "clojure.set",
+      "opts"
+     ],
+     "cost": 0.000434994
+    }
+   ],
+   "e2e": {
+    "verdict": "FAIL",
+    "runs": 8,
+    "greedy_pass": false,
+    "partial": false,
+    "unreachable_left_as_is": 0
+   },
+   "runs": [
+    {
+     "run": 0,
+     "fills": {
+      "483": "update-in"
+     },
+     "verdict": "FAIL",
+     "tail": "cljc\"}, :cause #object[Error Error: :rejected-slashes is not ISeqable]}\n\nRan 17 tests containing 37 assertions.\n0 failures, 8 errors.\n\n{:tests \"17\", :assertions \"37\", :failures \"0\", :errors \"8\"}\nFAIL\n"
+    },
+    {
+     "run": 1,
+     "fills": {
+      "483": "assoc-in"
+     },
+     "verdict": "FAIL",
+     "tail": "cljc\"}, :cause #object[Error Error: :rejected-slashes is not ISeqable]}\n\nRan 17 tests containing 37 assertions.\n0 failures, 8 errors.\n\n{:tests \"17\", :assertions \"37\", :failures \"0\", :errors \"8\"}\nFAIL\n"
+    },
+    {
+     "run": 2,
+     "fills": {
+      "483": "assoc"
+     },
+     "verdict": "FAIL",
+     "tail": "}return h.o(m,r,u,z)}throw Error(\"Invalid arity: \"+arguments.length);}]\n\nRan 17 tests containing 51 assertions.\n8 failures, 1 errors.\n\n{:tests \"17\", :assertions \"51\", :failures \"8\", :errors \"1\"}\nFAIL\n"
+    },
+    {
+     "run": 3,
+     "fills": {
+      "483": "fnil"
+     },
+     "verdict": "FAIL",
+     "tail": "return m.o(r,u,x,B)}throw Error(\"Invalid arity: \"+arguments.length);}]}\n\nRan 17 tests containing 37 assertions.\n0 failures, 8 errors.\n\n{:tests \"17\", :assertions \"37\", :failures \"0\", :errors \"8\"}\nFAIL\n"
+    },
+    {
+     "run": 4,
+     "fills": {
+      "483": "table"
+     },
+     "verdict": "FAIL",
+     "tail": "9/src/inga/power.cljc\"}, :cause #object[Error Error: Invalid arity: 4]}\n\nRan 17 tests containing 37 assertions.\n0 failures, 8 errors.\n\n{:tests \"17\", :assertions \"37\", :failures \"0\", :errors \"8\"}\nFAIL\n"
+    },
+    {
+     "run": 5,
+     "fills": {
+      "483": "set"
+     },
+     "verdict": "FAIL",
+     "tail": "ng}}, \"w4\" {:amount 100, :roles #{:ordering :storage}}}] [:height 1]}]}\n\nRan 17 tests containing 37 assertions.\n0 failures, 8 errors.\n\n{:tests \"17\", :assertions \"37\", :failures \"0\", :errors \"8\"}\nFAIL\n"
+    },
+    {
+     "run": 6,
+     "fills": {
+      "483": "storage-is-a-role-on-the-existing-market-not-a-second-economy"
+     },
+     "verdict": "FAIL",
+     "tail": "l: storage-is-a-role-on-the-existing-market-not-a-second-economy\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 7,
+     "fills": {
+      "483": "reduce"
+     },
+     "verdict": "FAIL",
+     "tail": "k/src/inga/power.cljc\"}, :cause #object[Error Error: Invalid arity: 4]}\n\nRan 17 tests containing 37 assertions.\n0 failures, 8 errors.\n\n{:tests \"17\", :assertions \"37\", :failures \"0\", :errors \"8\"}\nFAIL\n"
+    }
+   ]
+  },
+  {
+   "id": "kotoba-kotobase-server-3400f54a",
+   "repo": "kotobase-server",
+   "message": "fix(cypher): 未知文字を捨てず loud reject する — silent misread 2 件",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 0,
+    "insert": 5,
+    "delete": 0,
+    "ins_tokens": 57,
+    "del_tokens": 0
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-engi-163b5dcf",
+   "repo": "engi",
+   "message": "genesis is exempt in engi.sync too, and that cuts the loop",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 0,
+    "insert": 2,
+    "delete": 0,
+    "ins_tokens": 26,
+    "del_tokens": 0
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-engi-3f3cf8aa",
+   "repo": "engi",
+   "message": "a replica's chain is what it voted for",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 0,
+    "insert": 1,
+    "delete": 2,
+    "ins_tokens": 12,
+    "del_tokens": 4
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-engi-590dadf9",
+   "repo": "engi",
+   "message": "back to height-keyed leadership, with the gap written down instead of fixed",
+   "shape": {
+    "replace1": 1,
+    "replace_n": 3,
+    "insert": 2,
+    "delete": 1,
+    "ins_tokens": 6,
+    "del_tokens": 22
+   },
+   "n_holes": 1,
+   "holes": [
+    {
+     "pos": 447,
+     "old": "pm/leader-for-view",
+     "gold": "c/leader-for",
+     "kind": "symbol",
+     "n_options": 255,
+     "reachable": true,
+     "chance": 0.00392156862745098,
+     "top1": "pm",
+     "correct": false,
+     "gold_rank": 2,
+     "confidence": 0.56,
+     "p_gold": 0.23,
+     "order": [
+      "pm",
+      "c/leader-for",
+      "engi.pacemaker",
+      "c",
+      "zero?",
+      "when-let",
+      "wire/wire-id",
+      "without-verification-a-stranger-chooses-the-lock",
+      "witness",
+      "wire"
+     ],
+     "cost": 0.001027278
+    }
+   ],
+   "e2e": {
+    "verdict": "FAIL",
+    "runs": 8,
+    "greedy_pass": false,
+    "partial": false,
+    "unreachable_left_as_is": 0
+   },
+   "runs": [
+    {
+     "run": 0,
+     "fills": {
+      "447": "pm"
+     },
+     "verdict": "FAIL",
+     "tail": "                          ^\n\nError: Unable to resolve symbol: pm\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 1,
+     "fills": {
+      "447": "c/leader-for"
+     },
+     "verdict": "FAIL",
+     "tail": " r/default-params) (:engi.block/ts b1))\n  actual: (not (= 100 nil))\n\nRan 48 tests containing 105 assertions.\n22 failures, 0 errors.\n\n{:tests \"48\", :assertions \"105\", :failures \"22\", :errors \"0\"}\nFAIL\n"
+    },
+    {
+     "run": 2,
+     "fills": {
+      "447": "engi.pacemaker"
+     },
+     "verdict": "FAIL",
+     "tail": "              ^\n\nError: Unable to resolve symbol: engi.pacemaker\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 3,
+     "fills": {
+      "447": "c"
+     },
+     "verdict": "FAIL",
+     "tail": "                           ^\n\nError: Unable to resolve symbol: c\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 4,
+     "fills": {
+      "447": "zero?"
+     },
+     "verdict": "FAIL",
+     "tail": " r/default-params) (:engi.block/ts b1))\n  actual: (not (= 100 nil))\n\nRan 48 tests containing 105 assertions.\n22 failures, 0 errors.\n\n{:tests \"48\", :assertions \"105\", :failures \"22\", :errors \"0\"}\nFAIL\n"
+    },
+    {
+     "run": 5,
+     "fills": {
+      "447": "when-let"
+     },
+     "verdict": "FAIL",
+     "tail": "            ^\n\nError: when-let requires a vector for its binding\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    },
+    {
+     "run": 6,
+     "fills": {
+      "447": "wire/wire-id"
+     },
+     "verdict": "FAIL",
+     "tail": " r/default-params) (:engi.block/ts b1))\n  actual: (not (= 100 nil))\n\nRan 48 tests containing 105 assertions.\n22 failures, 0 errors.\n\n{:tests \"48\", :assertions \"105\", :failures \"22\", :errors \"0\"}\nFAIL\n"
+    },
+    {
+     "run": 7,
+     "fills": {
+      "447": "without-verification-a-stranger-chooses-the-lock"
+     },
+     "verdict": "FAIL",
+     "tail": "resolve symbol: without-verification-a-stranger-chooses-the-lock\n    at file:///Users/junkawasaki/github/com-junkawasaki/orgs/kotoba-lang/org-babashka-nbb/lib/nbb_impl_main.js:14:216\n\nNode.js v26.0.0\n"
+    }
+   ]
+  },
+  {
+   "id": "kotoba-engi-227c9d54",
+   "repo": "engi",
+   "message": "a block's clock is logical, so the same block is the same block",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 3,
+    "insert": 1,
+    "delete": 0,
+    "ins_tokens": 33,
+    "del_tokens": 3
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-slides-18cc9036",
+   "repo": "slides",
+   "message": "svg: a stroke is in inches too, and the same numbers on either host",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 2,
+    "insert": 49,
+    "delete": 0,
+    "ins_tokens": 159,
+    "del_tokens": 2
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-kuro-8d907acb",
+   "repo": "kuro",
+   "message": "feat(checkpoint): summary declares stream-layer truncation (#77)",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 1,
+    "insert": 1,
+    "delete": 0,
+    "ins_tokens": 28,
+    "del_tokens": 1
+   },
+   "n_holes": 0,
+   "holes": []
+  },
+  {
+   "id": "kotoba-kuro-8773addd",
+   "repo": "kuro",
+   "message": "fix(checkpoint): checkpoint-layer truncation survives restore into the receipt (#68)",
+   "shape": {
+    "replace1": 0,
+    "replace_n": 1,
+    "insert": 4,
+    "delete": 0,
+    "ins_tokens": 36,
+    "del_tokens": 2
+   },
+   "n_holes": 0,
+   "holes": []
+  }
+ ],
+ "corpus": {
+  "tasks": 24,
+  "with_holes": 6,
+  "holes": 51,
+  "ins_tokens": 2453,
+  "del_tokens": 191,
+  "replace_n": 43,
+  "insert": 115,
+  "delete": 6
+ },
+ "summary": {
+  "holes_total": 51,
+  "holes_reachable": 45,
+  "holes_answered": 45,
+  "top1_acc": 0.8888888888888888,
+  "mean_chance": 0.008199501725332221,
+  "mrr": 0.9235143414090783,
+  "top3_acc": 0.9555555555555556,
+  "mean_confidence_correct": 0.9265000000000001,
+  "mean_confidence_wrong": 0.298,
+  "tasks_attempted_e2e": 6,
+  "tasks_pass_greedy": 1,
+  "tasks_pass_backtrack": 1,
+  "kbb_runs": 41,
+  "api_cost_usd": 0.01767,
+  "wall_s": 28.8
+ }
+}

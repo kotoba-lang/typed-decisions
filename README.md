@@ -509,3 +509,51 @@ governor が実際にこの finding を裁定した時点でその裁定を `gol
 として Apache-2.0 で公開（owner 指示 2026-09-19、内容の compliance finding をそのまま含めてよいと確認済み）。
 card に「ungoaled、prediction フィールドは jev の予測であって正解ではない」ことを明記。他 family のような
 train/val/test 分割・精度表はまだ無い —— n=1 の種であることを card にもそのまま書く。
+
+## 第6反復（2026-09-19）: choice しか返さない model で kotoba の refactor は回るか —— `jev_holes.py`
+
+owner の問い: 「jev は 1 回の呼び出しでコードを書けない」は per-call の話で、生成とは反復された choice のこと。
+駆動ループ（穴を作る）・候補列挙（有限の option）・verifier（kbb で test）を外から与えれば、実 Jev で
+kotoba の fix pair を通せるか。test bed は段 0 の `data/kotoba-tasks.json`（24 pair、FAIL→PASS 検証済み）。
+
+**手順（`src/typed_decisions/jev_holes.py`、model は書かない）。** before/after を token 差分し、**1 token 削除 →
+1 token 挿入、両方 code-like**（keyword / symbol、文字列と `;` コメントは除外）の hunk だけを *穴* とする。option は
+「壊れた module と test に出る同種の token」（test が仕様であり、module が提供すべき名前を挙げている）**から
+置換前の token を除いたもの**。gold が option に無ければ *unreachable* として記録する（足さない）。穴ごとに
+Jev へ `choice` を 1 回（state = commit message + test + `<<HOLE>>` 入り module + 修正前の test 出力）、独立に。
+全穴に top-1 を入れて kbb で実 test、FAIL なら confidence の低い穴から Jev 自身の分布の次点へ backtrack、
+1 task 8 run まで。
+
+**corpus の形が最初の結果。** 変更 token は挿入 2,453 / 削除 191 —— **93% が新規挿入**で、1 token 置換の穴は
+51 個（うち 37 個は 1 task の `:inject`→`:no` の繰り返し）、穴を 1 つでも持つ pair は 24 中 6、**穴だけで
+直る pair は 1 つ**（`kototama-beae237c`）。この corpus は「test が反転する bugfix」を掘ったものなので生成に
+偏るのは当然で、dependency-substitution のような繋ぎ替え refactor は test を反転させないため入っていない。
+それでも「実 bugfix の大半は choice の外」は数字として残す。
+
+**穴の精度（run 2、置換前 token を除外後、45 穴、mean chance 0.008 ≈ 1/122）。**
+
+| | 穴 | top-1 | top-3 | MRR |
+|---|---|---|---|---|
+| 全体 | 45 | **0.889** | 0.956 | 0.924 |
+| 契約名への rename（`:log-append!`→`:log-write`、`:now`→`:clock-monotonic`、`update`→`update-in`、`:inject`→`:no`×37） | 40 | **1.000** | — | — |
+| 論理の変更（`second`→`first`、`init`→`n`、`pm/leader-for-view`→`c/leader-for`） | 5 | **0.000** | 0.6（rank 2 が 3 件） | — |
+| unreachable（`names` / `live` の新規識別子、`:max-log-write-bytes` は test にも module にも無い） | 6 | 測れない | | |
+
+**較正が最も強い結果。** run 1（置換前 token を option に残した）では誤答 6 件中 4 件が **「変えない」を
+confidence 0.89〜0.93 で選ぶ**現状維持バイアスで、正誤の confidence は重なった（正 0.76 / 誤 0.69）。除外した
+run 2 では **正答 min 0.79 / 誤答 max 0.56** と完全に分離 —— 閾値 0.6 で **auto-apply 40/40 正、escalate 5/5 誤**。
+ADR-2609181715 の `:autonomous` / `:escalate` 閾値がそのまま機能する形。
+
+**end-to-end。** 6 task 中 PASS 1（`beae237c`、greedy 1 run）。残りが落ちる理由は model ではない: `de177068` は
+到達可能な 2 穴を両方正解したが `:max-log-write-bytes` が spec にも file にも無い（commit message が言う
+`kotoba-core-contracts` を候補源に足せば届く —— **候補列挙器の問題**）、`inga` / `engi` は穴以外の挿入・削除
+hunk を持つ（**穴だけでは直らない pair**）、`native` / `sema` は新規識別子 2 つ（**生成**）。cost $0.018 / 45 穴
+（state が 4〜6k token なので $0.0004/穴、`$0.00003/呼び出し` の見積りは短い state の値）、45 API + 41 kbb run
+で壁時計 29 s。
+
+**読み方。** 「jev で refactor」は「できる／できない」ではなく 3 層に分かれる: (1) **既存の名前への繋ぎ替え**は
+option に名前がありさえすれば 40/40、較正込みで自動適用できる。(2) **論理の選択**（どの変数・どの関数）は
+top-1 0/5、rank 2 が多いので backtracking 付き探索の入口にはなるが単独では信用できない。(3) **新規の名前・
+新規の式**は option に無いので choice の外。この corpus では変更 token の 93% が (3)。次に測るのは候補源を
+symbol-index / kotoba-core-contracts に広げたときの reachable 率（`de177068` が通るか）と、(2) を型で刈ったときの
+rank（ADR の未着手項目そのもの）。
