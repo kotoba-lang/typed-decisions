@@ -46,8 +46,11 @@ def tokens(src: str) -> list[str]:
 
 
 def kind_of(tok: str) -> str | None:
-    if tok.startswith('"') or tok.startswith(";"):
+    if tok.startswith(";"):
         return None
+    if tok.startswith('"'):
+        # a whitespace-free string literal is a name (wire name, key, id), not prose
+        return "str" if len(tok) > 2 and not re.search(r"\s", tok) else None
     if not CODEISH.match(tok):
         return None
     if tok.startswith(":"):
@@ -76,20 +79,78 @@ def holes_of(before: str, after: str) -> tuple[list[dict], dict]:
     return holes, shape
 
 
-def options_for(hole: dict, before: str, test: str, cap: int = 255) -> list[str]:
-    pool = [t for t in tokens(before) + tokens(test) if kind_of(t) == hole["kind"]]
+BINDERS = {"let", "loop", "fn", "defn", "defn-", "for", "doseq", "binding", "when-let", "if-let", "letfn", "with-open", "dotimes"}
+
+
+def roles_of(src: str) -> tuple[list[str], dict[str, set[str]]]:
+    """A syntactic role per token (call = right after `(`, binding = inside the vector that follows a
+    binder, key = keyword, else arg) and, per token text, every role it is seen in. This is the
+    proxy for type pruning: these pairs are .cljc, and kotoba-sema types .kotoba sources only."""
+    ts = tokens(src)
+    roles, seen = [], {}
+    stack: list[str] = []  # "bind" while inside a binder's vector, else "vec"/"paren"
+    prev = None
+    for t in ts:
+        if t == "[":
+            stack.append("bind" if prev in BINDERS else "vec")
+            roles.append("punct")
+        elif t in "({":
+            stack.append("paren")
+            roles.append("punct")
+        elif t in ")]}":
+            if stack:
+                stack.pop()
+            roles.append("punct")
+        else:
+            if t.startswith(":"):
+                r = "key"
+            elif prev == "(":
+                r = "call"
+            elif stack and stack[-1] == "bind":
+                r = "binding"
+            else:
+                r = "arg"
+            roles.append(r)
+            seen.setdefault(t, set()).add(r)
+        prev = t
+    return roles, seen
+
+
+def repo_sources(repo: str, sha: str) -> str:
+    """Every .clj/.cljc/.cljk/.kotoba under src/ and test/ at `sha`, concatenated — the pool a
+    symbol-index over the repo would offer."""
+    r = subprocess.run(["git", "ls-tree", "-r", "--name-only", sha, "--", "src", "test"], cwd=repo, capture_output=True, text=True)
+    out = []
+    for f in r.stdout.split():
+        if f.endswith((".clj", ".cljc", ".cljk", ".kotoba")):
+            out.append(subprocess.run(["git", "show", f"{sha}:{f}"], cwd=repo, capture_output=True, text=True).stdout)
+    return "\n".join(out)
+
+
+def options_for(hole: dict, before: str, test: str, extra: str = "", prune_role: bool = False, cap: int = 255) -> tuple[list[str], dict]:
+    pool_src = before + "\n" + test + ("\n" + extra if extra else "")
+    pool = [t for t in tokens(pool_src) if kind_of(t) == hole["kind"]]
+    if hole["kind"] == "str":
+        # a name string is usually the name of a keyword nearby: offer every keyword's name as a string too
+        pool += ['"' + t[1:] + '"' for t in tokens(pool_src) if kind_of(t) == "keyword"]
     seen, opts = {hole["old"]}, []
     for t in pool:
         if t not in seen:
             seen.add(t)
             opts.append(t)
+    info = {"pool": len(opts), "gold_in_pool": hole["gold"] in opts}
+    if prune_role:
+        roles, seen_roles = roles_of(pool_src)
+        hole_role = roles_of(before)[0][hole["pos"]]
+        opts = [t for t in opts if hole_role in seen_roles.get(t, set())]
+        info.update({"role": hole_role, "after_role": len(opts), "gold_after_role": hole["gold"] in opts})
     if len(opts) > cap:
-        # keep the ones sharing a character 3-gram with the old token first, then the rest
         old = hole["old"]
         grams = {old[i:i + 3] for i in range(max(1, len(old) - 2))}
         opts.sort(key=lambda t: -len(grams & {t[i:i + 3] for i in range(max(1, len(t) - 2))}))
         opts = opts[:cap]
-    return opts
+    info["after_cap"] = len(opts)
+    return opts, info
 
 
 def with_hole(before: str, pos: int, marker: str = "<<HOLE>>") -> str:
@@ -153,6 +214,8 @@ def main(argv=None):
     ap.add_argument("--budget", type=int, default=8, help="max kbb runs per task incl. the greedy one")
     ap.add_argument("--only", default="", help="comma-separated task ids")
     ap.add_argument("--dry", action="store_true", help="no API, no kbb: just the corpus shape")
+    ap.add_argument("--pool", choices=["file", "repo"], default="file", help="candidate source: module+test, or every source file in the repo at the sha")
+    ap.add_argument("--prune-role", action="store_true", help="keep only candidates seen in the hole's syntactic role (proxy for type pruning)")
     a = ap.parse_args(argv)
 
     tasks = json.load(open(a.tasks))
@@ -160,7 +223,7 @@ def main(argv=None):
         keep = set(a.only.split(","))
         tasks = [t for t in tasks if t["id"] in keep]
     key = "" if a.dry else openrouter_key()
-    report = {"model": a.model, "tasks": [], "corpus": {}}
+    report = {"model": a.model, "pool": a.pool, "prune_role": a.prune_role, "tasks": [], "corpus": {}}
     corpus = {"tasks": len(tasks), "with_holes": 0, "holes": 0, "ins_tokens": 0, "del_tokens": 0, "replace_n": 0, "insert": 0, "delete": 0}
     t_start = time.time()
     total_cost = 0.0
@@ -178,10 +241,12 @@ def main(argv=None):
             print(json.dumps({k: row[k] for k in ("id", "n_holes", "shape")}), flush=True)
             continue
 
+        repo = os.path.join(a.top, "orgs", "kotoba-lang", t["repo"])
+        extra = repo_sources(repo, t["sha"]) if a.pool == "repo" else ""
         for h in holes:
-            opts = options_for(h, t["src_before"], t["test"])
+            opts, pinfo = options_for(h, t["src_before"], t["test"], extra, a.prune_role)
             reachable = h["gold"] in opts
-            hrow = {**h, "n_options": len(opts), "reachable": reachable, "chance": 1.0 / len(opts) if opts else None}
+            hrow = {**h, "n_options": len(opts), "reachable": reachable, "chance": 1.0 / len(opts) if opts else None, "pool_info": pinfo}
             if reachable:
                 state = (f"Commit intent: {t['message']}\n\n"
                          f"Test namespace (this is the specification the module must satisfy):\n{t['test']}\n\n"
@@ -199,10 +264,9 @@ def main(argv=None):
                 except Exception as e:  # noqa: BLE001
                     hrow.update({"error": str(e)[:200]})
             row["holes"].append(hrow)
-            print(json.dumps({k: hrow.get(k) for k in ("pos", "old", "gold", "n_options", "reachable", "top1", "correct", "gold_rank", "confidence")}), flush=True)
+            print(json.dumps({k: hrow.get(k) for k in ("old", "gold", "n_options", "reachable", "top1", "correct", "gold_rank", "confidence", "pool_info")}), flush=True)
 
         # end-to-end: greedy fill, then backtrack on the model's own ranking
-        repo = os.path.join(a.top, "orgs", "kotoba-lang", t["repo"])
         runs = []
         answered = [h for h in row["holes"] if "order" in h]
         partial = len(answered) < len(holes)

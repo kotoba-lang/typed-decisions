@@ -557,3 +557,49 @@ top-1 0/5、rank 2 が多いので backtracking 付き探索の入口にはな�
 新規の式**は option に無いので choice の外。この corpus では変更 token の 93% が (3)。次に測るのは候補源を
 symbol-index / kotoba-core-contracts に広げたときの reachable 率（`de177068` が通るか）と、(2) を型で刈ったときの
 rank（ADR の未着手項目そのもの）。
+
+## 第7反復（2026-09-19）: 候補源を repo に広げ、役割で刈る —— `jev_holes.py --pool repo --prune-role`
+
+第 6 反復が「model ではなく候補列挙器の問題」と名指しした 2 つを測った。(a) 候補源を module + test から
+**sha 時点の repo 全 source**（symbol-index が返すもの）に広げたときの到達率、(b) 穴の**構文上の役割**
+（`(` 直後 = call / binder の vector 内 = binding / keyword / それ以外 = arg）で候補を刈ったときの rank。
+(b) は型による刈り込みの *代理* —— これらの pair は `.cljc` で、kotoba-sema が型を付けるのは `.kotoba` だけ。
+
+**先に harness の欠陥を 1 つ直した。** 文字列 literal を丸ごと除外していたが、空白を含まない文字列は
+docstring ではなく *名前*（wire 名、model id）で、`de177068` の `"log-append!"`→`"log-write"` /
+`"now"`→`"clock-monotonic"` と `app-kotoba-cloud` の model id 3 件がこれに当たる。`str` kind として穴に数え、
+候補には同種の文字列に加えて **pool 内の keyword の名前を文字列にしたもの**を足す（名前文字列は隣の keyword と
+対になるのが普通）。穴は 51 → 56。
+
+| arm | 到達 | top-1 | top-3 | 正答 conf min | 誤答 conf max | 閾値 0.6: 自動適用 正/誤 · escalate | e2e |
+|---|---|---|---|---|---|---|---|
+| file | 47/56 | 0.894 | 0.957 | 0.77 | 0.51 | 42 / 0 · 5 | 2/7 |
+| file + role | 43/56 | **1.000** | 1.000 | 0.78 | — | 43 / 0 · 0 | 2/7 |
+| repo | **55/56** | 0.855 | 0.891 | 0.37 | **0.79** | 46 / **2** · 7 | 2/7 |
+| repo + role | 55/56 | 0.891 | 0.891 | 0.36 | 0.79 | 47 / 1 · 7 | 2/7 |
+
+**読み方。**
+- **rename refactor が 1 本、choice だけで通った。** `kototama-de177068`（keyword 2 + 名前文字列 2 を
+  `kotoba-core-contracts` の名前に揃える）は 4 arm すべてで greedy 1 run PASS、6 穴中 6 正解。file pool でも
+  通る —— `:max-log-write-bytes` の 2 穴は test に不要だった。第 6 反復で落ちていたのは文字列の穴を
+  埋めていなかったからで、到達率ではない。
+- **repo pool は到達を 47 → 55 にする**（残る 1 つ `live` は 255 上限の 3-gram 選抜で落ちた）。新たに届いた
+  `:max-log-write-bytes` ×2 と model id 文字列 ×3 は **5/5 top-1**。ただし代償があり、論理の穴の distractor が
+  増えて **較正が崩れる**: `init`→`n` に `initial`（0.79）、`pm/leader-for-view`→`c/leader-for` に
+  `leader-for-view`（0.75）を *自信を持って* 選ぶ。3-gram で 255 に絞る私の cap が、まさに似た名前を
+  選んで残すので、model が使っている名前の類似性という手掛かりを裏返しに突く。file pool では正誤の confidence が
+  分離していた（min 0.77 / max 0.51）のが、repo pool では逆転する（0.37 / 0.79）。**閾値は pool に依存する。**
+- **役割で刈るのは効くが、代理は代理。** call 位置の穴 `c/leader-for` は role を付けると全 arm で top-1
+  （接頭辞の無い `leader-for-view` が消える）、`first` も repo + role で一度 top-1。一方 file + role の 1.000 は
+  **生き残った 43 穴の上の数字**で、刈り込みが gold を 4 つ落としている（`first` は値として使われるが file
+  内では call 位置にしか現れない、`n` は binding として現れない）—— 型なら落とさない。binding 名の穴
+  （`init`→`n`）は役割で刈っても 522〜794 候補が残り rank 49〜171: **局所変数の命名は候補列挙では解けない。**
+- **e2e は 2/7 で頭打ち。** 残り 5 の理由は model の外: `native` / `sema` は新規識別子（`names` / `live`）+
+  論理、`inga` / `engi` / `app-cloud` は穴以外の挿入・削除 hunk を持つ。
+
+**結論の更新。** 「既存の名前への繋ぎ替え」は候補源が repo なら **到達 55/56、正答 46〜47/50** で、rename
+refactor は 1 本通る。候補を広げるほど論理の穴の較正が悪化するので、`:autonomous` の閾値は **穴の種類
+（keyword / 名前文字列 / call 位置 / binding）ごと**に持つのが正しく、単一の 0.6 ではない。論理の穴と
+新規の名前は引き続き choice の外。次に効くのは (1) この 56 穴を **gold 付き family として corpus に入れる**
+（第 5 反復の repo-governance と違い、gold は commit と test が保証する）、(2) 3-gram ではなく型・役割で
+255 に絞る cap、(3) `.kotoba` の pair が溜まったら kotoba-sema で刈って同じ表を取り直す。
