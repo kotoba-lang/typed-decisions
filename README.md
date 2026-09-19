@@ -479,3 +479,33 @@ family を 2〜3 問ずつ追加、42k → 90k question、$0.47。test / OOD は
   in-domain 0.8〜0.99 に届く（今日 13 family が全部そうなった）。これが「精度が高くなる」の実際の経路。
 - **未見の question を読む力（OOD 合計）**: 今日試した 2 lever では動かない。動かす候補は backbone を 1 段上げる
   （fleet に載る architecture で）か、OOD family 自体に教師ラベルを付けて in-domain 化するか。後者は結局 1 と同じ。
+
+## 第5反復（2026-09-19）: 新 family `repo-governance` —— 実 Jev API を workspace 自身の判断に向けた最初の記録
+
+owner の問い: workspace 内の agent loop（superproject の repo-bot / detector が見つける finding）を jev 形の
+Choice/Score/Noul で処理し、あとで学習に使える dataset として記録・公開できるか。ここまでの family（banking77 /
+sst5 / boolq、code_data、kotoba-tasks、hermes_data）は全て **外部 gold か runnable test を持つ**。今回追加した
+`repo-governance` はどちらも持たない —— superproject の finding（例: compliance-scope-boundary の
+cross-boundary finding）に「正解」を決めている者がまだいない、未解決の運用判断だから。
+
+**やったこと。** superproject 側の新ツール `scripts/jev-decide.cljk`(kotoba-lang/com-junkawasaki@codex/jev-decision-probe)
+から、実際の TypeSafe Jev（`typesafe/jev-1.13`、OpenRouter `POST /api/alpha/decisions`、この repo の学習済み
+model とは別物 —— 教師でも比較対象でもなく、記録対象の予測器）を呼び、その `state + questions + answers` を
+`data/repo-governance.jsonl` に 1 行 1 example で追記する。schema は `schema.Example` を再利用しつつ、
+**`Question.gold` を全問 `null` にし**、jev の実際の答えは `gold` にではなく別フィールド `prediction` に置く
+（このリポジトリの一貫した方針 ——「教師ラベルは gold の代用にしない」—— を、外部 gold が最初から無い family
+にも適用しただけ）。`gold_status` フィールドに `"unresolved -- ..."` と明記し、この family を読む側が
+`prediction` を gold と取り違えないようにした。
+
+**現状は corpus ではなく種（n=1）。** 1 件目（`meta.finding_id = "cross-boundary:cloud-itonami-kaisya"`）を記録:
+`needs_urgent_remediation` noul 0.42、`owning_area` choice `kotobase-planes`（p=0.80, confidence 0.73）、
+`severity` score 1.05/2（"moderate"、confidence 0.91）。cost $0.0000275/call。**訓練にはまだ使えない** ——
+`gold` が埋まって初めて他 family と同じ扱いになる。埋める経路は 2 つ、どちらも未着手: (a) owner か
+governor が実際にこの finding を裁定した時点でその裁定を `gold` に書き戻す、(b) 十分件数が溜まったら
+`teacher.py` と同じ形で外部の強い model に多数決させ、教師ラベルとして明示区別する（`prediction` を
+増やすだけで `gold` にはしない）。
+
+**公開。** `data/repo-governance.jsonl` を新規 HF dataset `com-kotobalabs/typed-decisions-repo-governance`
+として Apache-2.0 で公開（owner 指示 2026-09-19、内容の compliance finding をそのまま含めてよいと確認済み）。
+card に「ungoaled、prediction フィールドは jev の予測であって正解ではない」ことを明記。他 family のような
+train/val/test 分割・精度表はまだ無い —— n=1 の種であることを card にもそのまま書く。
