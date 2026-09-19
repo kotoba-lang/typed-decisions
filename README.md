@@ -650,6 +650,8 @@ split は無関係、全 split の isolated を使う。
 - 未測定: repo pool での到達（2,742 の unreachable がどこまで届くか）、student（DeBERTa）をこの family で
   訓練したときの in-domain / OOD、candidate の整形後の symbol 精度。
 
-**公開しない（今は）。** `data-holes/` は 65 repo の source 断片を state に含む。kotoba-lang の全 repo が
-public か確認していないので、HF には出さない。確認後に第 5 反復の dataset の 2 つ目の config として載せるのが
-形としては自然。corpus は `hole_data.py` で再生成できる（このリポジトリの慣例どおり data は commit しない）。
+**公開（2026-09-20）。** owner が kotoba-lang は public と確認、**GitHub API で 65 repo の visibility を実測したら
+64 public / 1 private（`app-kotoba-cloud`、68 record）** —— private の record を除いた 1,232 件（train 877 / val 70 /
+test 285、isolated ≤100 は 273 / 18 / 37）を `com-kotobalabs/typed-decisions-code-holes` として Apache-2.0 で公開。
+card に `changed_tokens` で filter せよと書き、jev の isolated 344 の数字を載せた。corpus は `hole_data.py` で
+再生成できる（data は commit しない慣例のまま）。
