@@ -603,3 +603,53 @@ refactor は 1 本通る。候補を広げるほど論理の穴の較正が悪�
 新規の名前は引き続き choice の外。次に効くのは (1) この 56 穴を **gold 付き family として corpus に入れる**
 （第 5 反復の repo-governance と違い、gold は commit と test が保証する）、(2) 3-gram ではなく型・役割で
 255 に絞る cap、(3) `.kotoba` の pair が溜まったら kotoba-sema で刈って同じ表を取り直す。
+
+## 第8反復（2026-09-20）: `code-holes` family —— git 履歴から gold 付きの穴を掘り、jev を held-out で測る
+
+第 7 反復の次の一手 (1): 56 穴ではなく、**kotoba-lang の git 履歴そのもの**から 1 token 置換を掘って gold 付き
+family にする（`hole_data.py`）。gold は commit が置いた token —— 教師ラベルより強く、test 検証済み pair より
+弱い（commit は間違えうる、test は偶然通らない）。`verified: "commit" | "test"` で区別。option は第 6 反復と同じ
+「module + test にある同種 token − 置換前」、gold が無ければ落として数える。split は **repository 単位**
+（test の穴は train に無い repo から）。
+
+**掘れたもの（80 repo × 300 commit、`reports/hole-data-stats.json`）。** file diff 5,941、穴 4,042、
+**gold 到達 1,300（symbol 969 / keyword 283 / str 48）、unreachable 2,742 = 68%** —— rename 先は編集中の file には
+無いのが普通で、第 7 反復の「候補源を repo に」はここでも効く（未測定）。挿入 1.31M / 削除 221k token、
+86% が挿入。
+
+**1 回目の held-out 評価は corpus の質を測っていた。** test split 200 穴で top-1 0.225（keyword 0.82、str 0.63、
+**symbol 0.08**）。内訳を見ると **200 穴中 167 が「変更 token 100 超の file diff の中の 1:1 alignment」**
+—— 大きな書き換えの中で偶然 1 対 1 に並んだ token で、誰も決めていない置換（`mapv`→`dec`、
+`brace-close`→`body`）。そこで symbol 0.05。11〜100 token の範囲では keyword/str **14/14**、symbol 5/16。
+各 record の meta に `changed_tokens` / `holes_in_file` を持たせて掘り直し、**isolated（≤100）は 1,300 中 344**。
+
+**isolated 344 穴で jev（`reports/hole-eval-jev-iso100.json`、$0.13、112 s）。** jev は何も学習していないので
+split は無関係、全 split の isolated を使う。
+
+| 変更 token | n | 全体 | keyword | str | symbol |
+|---|---|---|---|---|---|
+| 0–10 | 56 | 0.61 | 16/19 = 0.84 | 2/4 | 16/33 = 0.48 |
+| 11–30 | 92 | 0.50 | 26/47 = 0.55 | 11/16 = 0.69 | 9/29 = 0.31 |
+| 31–100 | 196 | 0.57 | 83/117 = 0.71 | 2/10 | 27/69 = 0.39 |
+| **合計** | **344** | **0.558** | **0.683**（chance 0.013） | 0.50 | **0.397**（chance 0.006） |
+
+閾値ゲート（自動適用 正/誤 · escalate）: 0.6 → 142/33 · 169、0.7 → 122/17 · 205、**0.8 → 108/9 · 227**
+（精度 0.92、適用率 0.34）。正答 confidence 平均 0.75 / 誤答 0.42。
+
+**読み方。**
+- **第 6・7 反復の 0.89 は keyword に偏った 56 穴の数字**（`:inject`→`:no` ×37）。履歴全体では keyword 0.68、
+  symbol 0.40 が jev の実力で、chance の 50〜60 倍だが半分は外す。
+- symbol で当たるのは **依存の繋ぎ替え**そのもの: `clojure.string`→`kotoba.lang.text`、
+  `clojure.data.json`→`json.data-json`、`commit-dag.core`→`chain.core`、`seq`→`empty?`、`update`→`update-in`
+  —— dependency-substitution-wave が数千件単位で抱えている形。外すのは **演算子・述語の意味変更**
+  （`inc`→`quot` に `+` を 0.94、`>`→`=` に `not=` を 0.83）と **接頭辞だけの lookalike**（`g/add-edge`→
+  `g/add-conditional-edges` に `g` を 0.98）。後者は候補の整形（名前空間付き symbol の穴に裸の alias を
+  出さない）で消せる。
+- 0.8 ゲートは「3 割を精度 9 割で自動、7 割は escalate」。escalate 先が LLM か人かは別の話だが、
+  **人が 1,300 件を全部見る代わりに 227 件を見る**のがこの model の今の価値。
+- 未測定: repo pool での到達（2,742 の unreachable がどこまで届くか）、student（DeBERTa）をこの family で
+  訓練したときの in-domain / OOD、candidate の整形後の symbol 精度。
+
+**公開しない（今は）。** `data-holes/` は 65 repo の source 断片を state に含む。kotoba-lang の全 repo が
+public か確認していないので、HF には出さない。確認後に第 5 反復の dataset の 2 つ目の config として載せるのが
+形としては自然。corpus は `hole_data.py` で再生成できる（このリポジトリの慣例どおり data は commit しない）。
