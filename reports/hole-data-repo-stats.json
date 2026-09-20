@@ -1,0 +1,35 @@
+{
+ "holes_kept": 1258,
+ "by_kind": {
+  "symbol": 947,
+  "keyword": 198,
+  "str": 113
+ },
+ "by_split": {
+  "train": 797,
+  "val": 71,
+  "test": 390
+ },
+ "isolated": {
+  "<=10": 47,
+  "<=30": 113,
+  "<=100": 355
+ },
+ "repos_with_holes": 19,
+ "with_test": 848,
+ "verified_test": 60,
+ "mean_options": 252.81240063593006,
+ "mined": {
+  "files-diffed": 2448,
+  "ins_tokens": 608595,
+  "del_tokens": 81203,
+  "hole-symbol": 1572,
+  "reach-repo-only": 833,
+  "hole-unreachable": 699,
+  "commit-skipped-files": 717,
+  "reach-file": 425,
+  "file-no-parent": 296,
+  "hole-keyword": 227,
+  "hole-str": 158
+ }
+}

@@ -14,8 +14,33 @@ import os
 import random
 import time
 
-from .jev_holes import jev_choice, openrouter_key, ranked
+import re
+
+from .jev_holes import jev_choice, openrouter_key, ranked, roles_of, tokens
 from .schema import read_jsonl
+
+READER = re.compile(r"^[#'`~@^]")
+
+
+def aliases_of(state: str) -> set[str]:
+    """Namespace aliases declared with `:as` in any ns form inside the state (module and test)."""
+    return set(re.findall(r":as\s+([A-Za-z][\w.\-*+!?<>=]*)", state))
+
+
+def hole_role(state: str) -> str:
+    ts = tokens(state)
+    roles, _ = roles_of(state)
+    return roles[ts.index("<<HOLE>>")] if "<<HOLE>>" in ts else "arg"
+
+
+def reshape(options: list[str], old: str, state: str) -> list[str]:
+    """第9反復: drop candidates that cannot be a replacement for THIS hole. Reader syntax never
+    can. A bare namespace alias (`g` for `g/add-edge`) cannot replace a namespaced symbol, but can
+    replace a bare one (measured: `ui` -> `dds-tokens`). `_` / `&` are binding syntax, so they are
+    candidates only in binding position (measured: `id` -> `_`). Only removes; never adds."""
+    al = aliases_of(state) if "/" in old else set()
+    placeholders = set() if hole_role(state) == "binding" else {"_", "&"}
+    return [o for o in options if o not in al and not READER.match(o) and o not in placeholders]
 
 
 def main(argv=None):
@@ -26,6 +51,7 @@ def main(argv=None):
     ap.add_argument("--model", default=os.environ.get("JEV_MODEL", "typesafe/jev-1.13"))
     ap.add_argument("--max-state", type=int, default=24000, help="chars; Jev context is 32K tokens")
     ap.add_argument("--out", default="reports/hole-eval-jev.json")
+    ap.add_argument("--reshape", action="store_true", help="apply candidate shaping (aliases, reader syntax, _ &)")
     a = ap.parse_args(argv)
     exs = read_jsonl(a.data)
     random.Random(a.seed).shuffle(exs)
@@ -35,10 +61,18 @@ def main(argv=None):
     for e in exs:
         q = e.questions[0]
         state = e.state if len(e.state) <= a.max_state else e.state[: a.max_state] + "\n[truncated]"
-        row = {"repo": e.meta["repo"], "sha": e.meta["sha"], "kind": e.meta["kind"], "old": e.meta["old"], "gold": q.options[q.gold],
-               "n_options": len(q.options), "has_test": e.meta["has_test"], "verified": e.meta["verified"]}
+        gold = q.options[q.gold]
+        options = reshape(q.options, e.meta["old"], e.state) if a.reshape else list(q.options)
+        row = {"repo": e.meta["repo"], "sha": e.meta["sha"], "kind": e.meta["kind"], "old": e.meta["old"], "gold": gold,
+               "n_options": len(options), "dropped": len(q.options) - len(options), "has_test": e.meta["has_test"], "verified": e.meta["verified"],
+               "changed_tokens": e.meta.get("changed_tokens")}
+        if gold not in options:
+            row["error"] = "gold-dropped-by-reshape"
+            rows.append(row)
+            print(json.dumps({k: row.get(k) for k in ("repo", "kind", "old", "gold", "error")}), flush=True)
+            continue
         try:
-            ans = jev_choice(state, q.instructions, q.options, a.model, key)
+            ans = jev_choice(state, q.instructions, options, a.model, key)
             order = ranked(ans["probabilities"])
             row.update({"top1": ans["choice"], "correct": ans["choice"] == row["gold"],
                         "gold_rank": order.index(row["gold"]) + 1 if row["gold"] in order else None,
