@@ -75,7 +75,24 @@ def test_for(repo: str, sha: str, mod_ns: str) -> str:
     return ""
 
 
-def mine_repo(repo: str, max_commits: int, stats: Counter, max_files: int = 3) -> list[dict]:
+def repo_pool(repo: str, sha: str, cache: dict) -> str:
+    """Every src/ and test/ source blob at `sha`, concatenated — what a symbol-index over the
+    repository at that commit would offer. Blobs are cached by object id across commits."""
+    _, tree = sh(["git", "ls-tree", "-r", sha, "--", "src", "test"], repo)
+    parts = []
+    for line in tree.splitlines():
+        meta, path = line.split("\t", 1)
+        if not path.endswith(SRC_EXT):
+            continue
+        blob = meta.split()[2]
+        if blob not in cache:
+            cache[blob] = sh(["git", "cat-file", "-p", blob], repo)[1]
+        parts.append(cache[blob])
+    return "\n".join(parts)
+
+
+def mine_repo(repo: str, max_commits: int, stats: Counter, max_files: int = 3, pool: str = "file") -> list[dict]:
+    blobs: dict = {}
     code, log = sh(["git", "log", "--format=%H%x09%s", f"-n{max_commits}", "--", "src"], repo)
     if code != 0:
         stats["repo-unreadable"] += 1
@@ -102,15 +119,20 @@ def mine_repo(repo: str, max_commits: int, stats: Counter, max_files: int = 3) -
                 continue
             mod_ns = ns_of(after) or src_rel
             test = test_for(repo, sha, mod_ns)
+            extra = repo_pool(repo, sha, blobs) if pool == "repo" else ""
             for h in holes:
                 stats[f"hole-{h['kind']}"] += 1
-                opts = options_for(h, before, test)
+                file_opts = options_for(h, before, test)
+                file_reach = h["gold"] in file_opts
+                opts = options_for(h, before, test + "\n" + extra) if extra else file_opts
                 if h["gold"] not in opts:
                     stats["hole-unreachable"] += 1
                     continue
+                stats["reach-file" if file_reach else "reach-repo-only"] += 1
                 out.append({"repo": os.path.basename(repo), "sha": sha, "message": msg[:200], "src_path": src_rel,
                             "module_ns": mod_ns, "has_test": bool(test), "pos": h["pos"], "old": h["old"], "gold": h["gold"],
                             "changed_tokens": shape["ins_tokens"] + shape["del_tokens"], "holes_in_file": len(holes),
+                            "file_reachable": file_reach,
                             "kind": h["kind"], "options": opts, "state": (
                                 f"Commit intent: {msg[:200]}\n\n"
                                 + (f"Test namespace (the specification the module must satisfy):\n{test}\n\n" if test else "")
@@ -125,7 +147,8 @@ def to_example(h: dict, verified: str) -> Example:
     return Example(state=h["state"], questions=[q], source="code-holes",
                    meta={"repo": h["repo"], "sha": h["sha"], "src_path": h["src_path"], "old": h["old"], "kind": h["kind"],
                          "has_test": h["has_test"], "verified": verified, "n_options": len(h["options"]),
-                         "changed_tokens": h["changed_tokens"], "holes_in_file": h["holes_in_file"]})
+                         "changed_tokens": h["changed_tokens"], "holes_in_file": h["holes_in_file"],
+                         "file_reachable": h.get("file_reachable", True)})
 
 
 def main(argv=None):
@@ -135,6 +158,7 @@ def main(argv=None):
     ap.add_argument("--repos", type=int, default=80, help="mine this many repos, by src commit count")
     ap.add_argument("--max-commits", type=int, default=300)
     ap.add_argument("--tasks", default="data/kotoba-tasks.json", help="test-verified pairs: their holes get verified=test")
+    ap.add_argument("--pool", choices=["file", "repo"], default="file", help="candidate source: module+test, or every source file at the sha")
     a = ap.parse_args(argv)
     org = os.path.join(a.top, "orgs", "kotoba-lang")
     cands = []
@@ -155,7 +179,7 @@ def main(argv=None):
     stats = Counter()
     holes = []
     for repo in chosen:
-        hs = mine_repo(repo, a.max_commits, stats)
+        hs = mine_repo(repo, a.max_commits, stats, pool=a.pool)
         holes += hs
         print(json.dumps({"repo": os.path.basename(repo), "holes": len(hs)}), flush=True)
 

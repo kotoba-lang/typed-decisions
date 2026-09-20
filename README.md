@@ -655,3 +655,47 @@ split は無関係、全 split の isolated を使う。
 test 285、isolated ≤100 は 273 / 18 / 37）を `com-kotobalabs/typed-decisions-code-holes` として Apache-2.0 で公開。
 card に `changed_tokens` で filter せよと書き、jev の isolated 344 の数字を載せた。corpus は `hole_data.py` で
 再生成できる（data は commit しない慣例のまま）。
+## 第9反復（2026-09-20）: 候補の整形と repo pool —— 到達は 3 倍、symbol の精度はその分だけ落ちる
+
+第 8 反復の次の一手 (3) と (1)。どちらも `hole_eval.py --reshape` / `hole_data.py --pool repo`。
+
+**(3) 候補の整形（`reshape`）。** 穴の置換になり得ない候補だけを落とす: reader 構文（`#` `'` `` ` `` `~` `@` `^`
+始まり）は常に、**namespace alias の裸 symbol**（`g/add-edge` の穴に `g`）は穴が namespaced なときだけ、`_` / `&` は
+穴が binding 位置でないときだけ。最初の版は無条件に落として gold を 4 つ消した（`id`→`_` は unused binding の
+実 refactor、`ui`→`dds-tokens` は alias が裸 symbol を置き換える実例）ので、穴の形で条件付けた。isolated 344 穴で
+候補 136 個を落とし gold は 0。**再採点: 0.558 → 0.567、symbol 0.397 → 0.412。** 穴ごとの反転は 正→誤 2 / 誤→正 7、
+うち整形が実際に候補を変えた穴での反転は 4（`clojure.data.json`→`json.data-json` ×3 で `json` が消えて正解）—— 残り
+5 は候補が同じ穴で答えが変わった、つまり **jev の呼び出し間の揺れが ±1.5 pt ある**。整形の効果はその揺れと同程度。
+
+**(1) repo pool（20 repo × 150 commit、blob を cache して sha 時点の全 source を候補源に）。**
+
+| | 穴 | 割合 |
+|---|---|---|
+| 見つかった穴 | 1,957 | |
+| file pool で到達 | 425 | 22% |
+| repo pool で新たに到達 | 833 | +43% → **64%** |
+| なお unreachable（新規の名前） | 699 | 36% |
+
+isolated（≤100）355 穴で jev（整形あり、cap 255 は役割優先）:
+
+| 到達源 | n | 全体 | keyword | str | symbol | mean k |
+|---|---|---|---|---|---|---|
+| file でも届く | 147 | 0.67 | 86/110 = 0.78 | 2/3 | 10/34 = 0.29 | 246 |
+| **repo でしか届かない** | 208 | 0.34 | 24/33 = **0.73** | 18/26 = **0.69** | 29/149 = 0.19 | 248 |
+| 合計 | 355 | 0.48 | 0.77 | 0.69 | 0.21 | 247 |
+
+閾値 0.8: 自動適用 97 件中 83 正 / 14 誤（精度 0.86、適用率 0.27）、258 escalate。
+
+同じ穴で pool だけ変えた対照（両 run に共通の 53 穴）: 全体 0.51 → 0.47、keyword 15 → 16、**symbol 10 → 7**、
+mean k 148 → 242。**候補を 3 倍に広げても keyword は落ちず、symbol が 3/26 落ちる** —— 第 7 反復と同じ向き。
+
+**読み方。**
+- **repo pool は明確に得。** 到達 22 → 64% で、新たに届いた穴のうち keyword 0.73 / 名前文字列 0.69 は file pool と
+  同水準。symbol 0.19 の中身は依存の繋ぎ替え（`clojure.string`→`kotoba.lang.text`、`clojure.edn`→`kotoba.lang.edn`、
+  `multiformats.core`→`sha2.core`、`hiccup/->html`→`html/html5`）—— **rename 先が別の file に既に在る、という
+  dependency-substitution の形そのもの**が、この model が最も得意な穴。
+- 残る 36% は sha 時点の repo に無い名前 = 生成。ここは choice の外で、変わらない。
+- symbol は候補が増えるほど落ちる（0.38 → 0.27）。cap 255 に対して mean k 247 なので、255 の中で **役割・型で
+  さらに刈る**か、jev の分布の top-k を第二段の判定（型検査、test）に渡す設計が要る。
+- 公開: この run の repo-pool 版は `com-kotobalabs/typed-decisions-code-holes` に config `repo-pool` として追加
+  （private の `app-kotoba-cloud` を除く）。
