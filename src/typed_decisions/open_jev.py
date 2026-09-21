@@ -18,8 +18,10 @@ This file is copied into the model repo so `pip install typed-decisions` is not 
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
+import sys
 
 import torch
 import torch.nn as nn
@@ -80,3 +82,73 @@ class OpenJev:
     @torch.no_grad()
     def decide_batch(self, items: list[tuple[str, list[dict]]]) -> list[list[dict]]:
         return [self.decide(s, qs) for s, qs in items]
+
+
+def decide_request(model: OpenJev, request: dict) -> dict:
+    """Validate one JSON wire request and return a provenance-bearing result.
+
+    This is deliberately a typed-decision surface, not a text-generation
+    compatibility endpoint.  A caller supplies a closed option set and gets
+    one calibrated distribution per question; unknown request fields and
+    malformed questions fail before a model forward.
+    """
+    if set(request) != {"state", "questions"}:
+        raise ValueError("request must contain exactly state and questions")
+    if not isinstance(request["state"], str) or not request["state"]:
+        raise ValueError("state must be a non-empty string")
+    if not isinstance(request["questions"], list) or not request["questions"]:
+        raise ValueError("questions must be a non-empty list")
+    for index, question in enumerate(request["questions"]):
+        if not isinstance(question, dict):
+            raise ValueError(f"question {index} must be an object")
+        kind = question.get("type")
+        expected = {"type", "instructions"} if kind == "noul" else {"type", "instructions", "options"}
+        if kind not in {"choice", "score", "noul"} or set(question) != expected:
+            raise ValueError(f"question {index} has an invalid kind or field set")
+        if not isinstance(question["instructions"], str) or not question["instructions"]:
+            raise ValueError(f"question {index} instructions must be a non-empty string")
+        if kind != "noul":
+            options = question["options"]
+            limit = 10 if kind == "score" else 255
+            if (not isinstance(options, list) or not 2 <= len(options) <= limit or
+                    not all(isinstance(option, str) and option for option in options) or
+                    len(set(options)) != len(options)):
+                raise ValueError(f"question {index} options are invalid")
+    decisions = model.decide(request["state"], request["questions"])
+    return {
+        "kind": "typed-decisions/open-jev-v1",
+        "generated_text": False,
+        "model": {
+            "base_model": model.config.get("base_model"),
+            "pool": model.config.get("pool"),
+            "temperature": model.config.get("temperature"),
+            "train": model.config.get("train"),
+            "metrics": model.config.get("metrics"),
+        },
+        "decisions": decisions,
+    }
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Run a trained OpenJev typed-decision model over one JSON request from stdin."
+    )
+    parser.add_argument("--model", default="com-kotobalabs/open-jev-deberta-v3-large")
+    parser.add_argument("--revision")
+    parser.add_argument("--device")
+    args = parser.parse_args(argv)
+    try:
+        request = json.load(sys.stdin)
+        model = OpenJev.from_pretrained(args.model, device=args.device, revision=args.revision)
+        result = decide_request(model, request)
+        result["artifact"] = {"repo_or_dir": args.model, "revision": args.revision}
+        json.dump(result, sys.stdout, ensure_ascii=False, separators=(",", ":"))
+        sys.stdout.write("\n")
+        return 0
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        print(json.dumps({"error": "invalid-request", "message": str(exc)}, ensure_ascii=False), file=sys.stderr)
+        return 64
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
