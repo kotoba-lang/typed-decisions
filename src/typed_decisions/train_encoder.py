@@ -115,7 +115,13 @@ def main(argv=None) -> dict:
             if step >= total_steps:
                 break
             chunk = [train[j] for j in order[i : i + a.batch]]
-            items = [(e.state, [augment(q, random) if a.augment and random.random() < a.augment else q for q in e.questions]) for e in chunk]
+            items = [
+                (e.state, [
+                    augment(q, random) if a.augment and not e.meta.get("target_families") and random.random() < a.augment else q
+                    for q in e.questions
+                ])
+                for e in chunk
+            ]
             batch = coll(items, dev)
             with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=use_amp):
                 logits = model(batch["input_ids"], batch["attention_mask"], batch["opt_pos"], batch["opt_mask"], batch["q_pos"], batch["seg"])
