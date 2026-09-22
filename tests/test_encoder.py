@@ -4,7 +4,7 @@ import os
 import torch
 
 from typed_decisions.encoder import DecisionEncoder, Collator, load_tokenizer, MARKERS
-from typed_decisions.schema import read_jsonl
+from typed_decisions.schema import Question, read_jsonl
 from typed_decisions import train_encoder
 
 MODEL = "answerdotai/ModernBERT-base"  # tokenizer only; the model is a tiny random config
@@ -56,6 +56,15 @@ def test_padding_does_not_leak(synth_data):
     diff = (la[finite] - lb[finite]).abs().max().item()
     assert int(finite.sum()) == 4 + 5 + 2
     assert diff < 1e-4, diff
+
+
+def test_questions_take_priority_when_state_and_augmentation_fill_context():
+    tok = load_tokenizer(MODEL)
+    coll = Collator(tok, max_state_tokens=512, max_len=64)
+    questions = [Question("q", "choice", "Pick the best answer from this deliberately longer instruction.", ["first option", "second option"], 0)]
+    ids, positions, _, _ = coll.encode_one("state " * 500, questions)
+    assert len(ids) == 64
+    assert tok.convert_tokens_to_ids("[OPT]") == ids[positions[0][0]]
 
 
 def test_end_to_end_learns_rule(synth_data, tmp_path):

@@ -101,25 +101,30 @@ class Collator:
         return r
 
     def encode_one(self, state: str, questions: list[Question]):
-        ids = [self.cls, self.m_state] + self._ids(state)[: self.max_state]
+        # Questions define the requested typed outputs, so they take precedence over state tail
+        # tokens when an augmented instruction makes a pack cross the context limit. Compute the
+        # exact question budget first instead of failing late after a mostly completed epoch.
+        q_tokens = [(self._ids(q.instructions), [self._ids(o) for o in q.options]) for q in questions]
+        question_tokens = sum(1 + len(qt) + sum(1 + len(ot) for ot in opts) for qt, opts in q_tokens)
+        state_budget = self.max_len - 3 - question_tokens  # CLS + STATE marker + SEP
+        if state_budget < 0:
+            raise ValueError(f"questions need {question_tokens + 3} tokens > max_len {self.max_len}: {len(questions)} questions")
+        ids = [self.cls, self.m_state] + self._ids(state)[: min(self.max_state, state_budget)]
         positions: list[list[int]] = []
         q_positions: list[int] = []
         spans: list[tuple[int, int, int]] = []  # (segment id, start, end) over token positions; segment = q*OM + o for options, -(q+1) for question text
-        for qi, q in enumerate(questions):
+        for qi, (q, (t, option_tokens)) in enumerate(zip(questions, q_tokens)):
             q_positions.append(len(ids))
-            t = self._ids(q.instructions)
             spans.append((-(qi + 1), len(ids) + 1, len(ids) + 1 + len(t)))
             ids += [self.m_q] + t
             pos = []
-            for oi, o in enumerate(q.options):
+            for oi, t in enumerate(option_tokens):
                 pos.append(len(ids))
-                t = self._ids(o)
                 spans.append((qi * self.OM + oi, len(ids) + 1, len(ids) + 1 + len(t)))
                 ids += [self.m_opt] + t
             positions.append(pos)
         ids.append(self.sep)
-        if len(ids) > self.max_len:
-            raise ValueError(f"sequence {len(ids)} > max_len {self.max_len}: state + {len(questions)} questions")
+        assert len(ids) <= self.max_len
         return ids, positions, q_positions, spans
 
     def __call__(self, items: list[tuple[str, list[Question]]], device=None):

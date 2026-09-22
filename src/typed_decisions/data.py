@@ -192,7 +192,8 @@ SOURCES = {
 LOADERS = {"banking77": _banking77, "sst5": _sst5, "boolq": _boolq}
 
 
-def build(out_dir: str, n_train: int, n_val: int, n_test: int, seed: int = 0, extra_train_families: bool = False) -> dict:
+def build(out_dir: str, n_train: int, n_val: int, n_test: int, seed: int = 0, extra_train_families: bool = False,
+          target_train_families: bool = False) -> dict:
     os.makedirs(out_dir, exist_ok=True)
     rng = random.Random(seed)
     train, val, test = [], [], []
@@ -213,6 +214,15 @@ def build(out_dir: str, n_train: int, n_val: int, n_test: int, seed: int = 0, ex
         # example's packing, and therefore its tokens, is unchanged)
         train += [Example(state=e.state, source=e.source, meta=dict(e.meta, families=True), questions=train_families(e, e.meta.get("label_name"))) for e in list(train)]
         train = [e for e in train if e.questions]
+    if target_train_families:
+        # Domain adaptation for a declared question contract: use only TRAIN states and their
+        # dataset-derived labels. Test states remain disjoint. The resulting fixed-test metric is
+        # held-out by state, but intentionally no longer OOD by question family.
+        adapted = [Example(state=e.state, source=e.source, meta=dict(e.meta, target_families=True),
+                           questions=ood_questions(e, e.meta.get("label_name"))) for e in list(train)]
+        adapted = [e for e in adapted if e.questions]
+        train += adapted
+        counts["target_train_families"] = {"states": len(adapted), "questions": sum(len(e.questions) for e in adapted)}
     rng.shuffle(train)
     rng.shuffle(test)
     write_jsonl(os.path.join(out_dir, "train.jsonl"), train)
@@ -234,9 +244,10 @@ def main(argv=None):
     ap.add_argument("--n-test", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--extra-train-families", action="store_true")
+    ap.add_argument("--target-train-families", action="store_true", help="add the fixed OOD question families on disjoint training states")
     a = ap.parse_args(argv)
     import json
-    print(json.dumps(build(a.out, a.n_train, a.n_val, a.n_test, a.seed, a.extra_train_families), indent=1))
+    print(json.dumps(build(a.out, a.n_train, a.n_val, a.n_test, a.seed, a.extra_train_families, a.target_train_families), indent=1))
 
 
 if __name__ == "__main__":

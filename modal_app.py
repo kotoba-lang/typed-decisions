@@ -44,9 +44,9 @@ def _gpu() -> str:
 
 
 @app.function(image=image, timeout=3600, volumes={"/cache": vol}, secrets=secrets)
-def data_remote(n_train: int, n_val: int, n_test: int) -> dict:
+def data_remote(n_train: int, n_val: int, n_test: int, out_dir: str = DATA, target_train_families: bool = False) -> dict:
     from typed_decisions import data
-    counts = data.build(DATA, n_train, n_val, n_test)
+    counts = data.build(out_dir, n_train, n_val, n_test, target_train_families=target_train_families)
     vol.commit()
     return counts
 
@@ -86,8 +86,8 @@ def _save(rep: dict, name: str):
 
 
 @app.local_entrypoint()
-def data(n_train: int = 6000, n_val: int = 400, n_test: int = 1000):
-    print(json.dumps(data_remote.remote(n_train, n_val, n_test), indent=1))
+def data(n_train: int = 6000, n_val: int = 400, n_test: int = 1000, out_dir: str = DATA, target_train_families: bool = False):
+    print(json.dumps(data_remote.remote(n_train, n_val, n_test, out_dir, target_train_families), indent=1))
 
 
 @app.local_entrypoint()

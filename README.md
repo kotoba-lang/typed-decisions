@@ -480,6 +480,30 @@ family を 2〜3 問ずつ追加、42k → 90k question、$0.47。test / OOD は
 - **未見の question を読む力（OOD 合計）**: 今日試した 2 lever では動かない。動かす候補は backbone を 1 段上げる
   （fleet に載る architecture で）か、OOD family 自体に教師ラベルを付けて in-domain 化するか。後者は結局 1 と同じ。
 
+## 対象 question family 適応（2026-09-21）: held-out state で 0.668 → 0.829
+
+上の見積りを、固定 OOD set の question contract 自体を対象に実測した。`data.py
+--target-train-families` は banking77 / SST-5 / BoolQ の **train state だけ**に `ood_questions`
+と同じ family を追加する。test 3,000 state は分離したままなので state のリークは無いが、question family は
+意図的に既知になる。このため下表の右列は「OOD 改善」ではなく **対象familyの held-out-state性能** と呼ぶ。
+
+| | 公開版と同じ3-family学習 | + target family学習 |
+|---|---:|---:|
+| 従来 test 7,000問 accuracy | **0.860** | 0.858 |
+| 対象 test 8,000問 accuracy | 0.668 | **0.829** |
+| 対象 choice / noul / score | 0.638 / 0.836 / 0.458 | **0.891 / 0.927 / 0.589** |
+| 対象 score MAE | 0.643 | **0.494** |
+| 対象 Brier / NLL / ECE | 0.426 / 0.737 / 0.033 | **0.239 / 0.418 / 0.025** |
+
+条件は DeBERTa-v3-large、seed 2、1 epoch、augment 0.7、H100 80GB。36,000 train state / 90,000
+question、学習 428.4秒、実測 $0.470。従来familyへの退行は accuracy -0.19 pt、Banking77 77択は
+0.931 → 0.925。対象familyには既存の汎用augmentationを掛けない（FALSE question の二重否定や
+ordered scale の無関係な relabel を避ける）。report は
+`reports/target-family-clean-deb-large-1ep-20260921-095730.json`。
+
+同時に collator を question-first budget に変更した。augmented instruction が512 token境界を越える場合、
+質問を失敗させず state の末尾を追加で切り詰める。質問群だけで上限を超える場合は従来どおり明示的に拒否する。
+
 ## 第5反復（2026-09-19）: 新 family `repo-governance` —— 実 Jev API を workspace 自身の判断に向けた最初の記録
 
 owner の問い: workspace 内の agent loop（superproject の repo-bot / detector が見つける finding）を jev 形の
