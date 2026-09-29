@@ -1,5 +1,5 @@
 """Accuracy, Brier, ECE and score-MAE over predicted distributions. Every number comes with its
-`n`; a group with n = 0 is reported as `null`, never as 0.0 or 1.0 (CLAUDE.md 8 問 #1)."""
+`n`; a group with n = 0 is reported as `null`, never as 0.0 or 1.0 (AGENTS.md 8 問 #1)."""
 
 from __future__ import annotations
 
